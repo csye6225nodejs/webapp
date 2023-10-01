@@ -4,6 +4,7 @@ const path = require('path');
 const csv = require('csv-parser');
 const account = require('./../models/Account');
 const sequelize = require('./../config/dbconfig');
+const bcrypt = require('bcrypt');
 
 function LoadFromCSV() {
     sequelize.authenticate()
@@ -18,13 +19,21 @@ function LoadFromCSV() {
                     account.findOne({ where: { email: row.email } })
                         .then((existingUser) => {
                             if (!existingUser) {
-                                account.create({
-                                    first_name: row.first_name,
-                                    last_name: row.last_name,
-                                    email: row.email,
-                                    password: row.password
+                                // Hash the password using bcrypt
+                                bcrypt.hash(row.password, 10, (err, hashedPassword) => {
+                                  if (err) {
+                                    console.error('Failed to hash the password:', err);
+                                  } else {
+                                    // Create the user with the hashed password
+                                    account.create({
+                                      first_name: row.first_name,
+                                      last_name: row.last_name,
+                                      email: row.email,
+                                      password: hashedPassword, // Store the hashed password
+                                    });
+                                  }
                                 });
-                            }
+                              }
                         });
                 })
                 .on('end', () => {

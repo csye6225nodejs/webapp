@@ -26,7 +26,7 @@ const Assignment = sequelize.define('assignment',{
         type: DataTypes.DATE,
         allowNull: false
     },
-    //link assignment to users
+    //links assignment to users its a foreign key
     userId: { 
         type: DataTypes.INTEGER,
         allowNull: false,
