@@ -22,11 +22,6 @@ jobs:
           node-version: 20
       - name: Install dependencies
         run: npm install
-      - name: Wait for MYSQL
-        run: |
-          while ! mysqladmin ping -h mysql --silent; do
-            sleep 1
-          done
       - name: Run test
         run: npm test
      
