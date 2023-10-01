@@ -6,6 +6,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: 
+          MYSQL_USER:
+          MYSQL_PASSWORD:
+          MYSQL_DATABASE: 
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -13,6 +24,11 @@ jobs:
           node-version: 20
       - name: Install dependencies
         run: npm install
+      - name: Wait for MYSQL
+        run: |
+          while ! mysqladmin ping -h mysql --silent; do
+            sleep 1
+          done
       - name: Run test
         run: npm test
      
