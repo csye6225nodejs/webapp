@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('./../config/dbconfig');
+const Assignment = require('./Assignment');
 
 const Account = sequelize.define('account',{
     first_name: {
@@ -18,8 +19,8 @@ const Account = sequelize.define('account',{
         type: DataTypes.STRING,
         allowNull: false
     }
-},{
-    tableName:'account'
 });
+
+Account.hasMany(Assignment, { foreignKey: 'userId' });
 
 module.exports = Account;
