@@ -10,13 +10,14 @@ app.use(bodyParser.urlencoded());
 
 // Import route definitions
 const healthzRoute = require('./routes/healthRouter');
-const { LoadFromCSV } = require('./services/csvLoader');
+const assignmentRouter = require('./routes/assignmentRouter');
 
-//Import Load User from CSV
-LoadFromCSV();
 
 // Use route definitions
 app.use('/healthz', healthzRoute);
+
+app.use('/v1/assignments',assignmentRouter);
+
 app.listen(port, () => {
     console.log("Server is running on port 8080");
 });
