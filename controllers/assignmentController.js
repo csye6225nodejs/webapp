@@ -32,7 +32,7 @@ async function addAssignment(req, res) {
     try {
         const { name, points, num_of_attempts, deadline} = req.body;
         const userId = req.userId;
-        if (!name || !points || !num_of_attempts || !deadline || !req.userId) {
+        if (!name || !points || !num_of_attempts || !deadline || !req.userId ) {
             return res.status(400).json({ error: 'Missing required data in the request body' });
         }
 
@@ -58,12 +58,11 @@ async function addAssignment(req, res) {
 
 async function updateAssignment(req, res) {
     try {
-        const { name, points, num_of_attempts, deadline } = req.body;
         const assignmentId = req.params.id; // Assuming you pass the assignment ID as a route parameter
         const userId = req.userId;
 
-        if (!name || !points || !num_of_attempts || !deadline || !userId) {
-            return res.status(400).json({ error: 'Missing required data in the request body' });
+        if (!assignmentId || !userId) {
+            return res.status(400).json({ error: 'Missing assignment ID or user ID' });
         }
 
         await sequelize.sync();
@@ -75,11 +74,24 @@ async function updateAssignment(req, res) {
             return res.status(404).json({ error: 'Assignment not found' });
         }
 
-        // Update the assignment with the provided data
-        existingAssignment.name = name;
-        existingAssignment.points = points;
-        existingAssignment.num_of_attempts = num_of_attempts;
-        existingAssignment.deadline = deadline;
+        // Check if userId or assignmentId are provided in the request body
+        if (req.body.id || req.body.userId || req.body.assignmentId) {
+            return res.status(400).json({ error: 'Changing userId or assignmentId is not allowed' });
+        }
+
+        // Update only the fields that are provided in the request body
+        if (req.body.name) {
+            existingAssignment.name = req.body.name;
+        }
+        if (req.body.points) {
+            existingAssignment.points = req.body.points;
+        }
+        if (req.body.num_of_attempts) {
+            existingAssignment.num_of_attempts = req.body.num_of_attempts;
+        }
+        if (req.body.deadline) {
+            existingAssignment.deadline = req.body.deadline;
+        }
 
         await existingAssignment.save(); // Save the changes to the database
 
@@ -93,26 +105,30 @@ async function updateAssignment(req, res) {
 async function deleteAssignment(req, res) {
     try {
         const assignmentId = req.params.id; // Capture the assignment ID from the URL
+        const userId = req.userId; // Assuming you have a way to get the authenticated user's ID
 
-        // Use the assignmentId to look up and delete the assignment
-        const assignment = await Assignment.findByPk(assignmentId);
+        // Use the assignmentId to look up the assignment
+        const assign = await assignment.findByPk(assignmentId);
 
-        if (!assignment) {
+        if (!assign) {
             return res.status(404).json({ error: 'Assignment not found' });
         }
 
-        // Check if the assignment belongs to the authenticated user (you can add this logic)
-        // You can use req.userId to check ownership
+        // Check if the assignment belongs to the authenticated user
+        if (assign.userId !== userId) {
+            return res.status(401).json({ error: 'Unauthorized: Assignment does not belong to you' });
+        }
 
         // Perform the delete operation
-        await assignment.destroy();
+        await assign.destroy();
 
-        res.status(204).send(); // Respond with a success status and no content
+        res.status(200).send(); // Respond with a success status and no content
     } catch (error) {
         console.error('Failed to delete the assignment:', error);
         res.status(500).json({ error: 'Failed to delete the assignment' });
     }
 }
+
 
 
 

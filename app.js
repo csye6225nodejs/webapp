@@ -7,6 +7,7 @@ app.use(bodyParser.text());
 app.use(bodyParser.raw());
 app.use(bodyParser.urlencoded());
 
+require('dotenv').config();
 // Import route definitions
 const healthzRoute = require('./routes/healthRouter');
 const assignmentRouter = require('./routes/assignmentRouter');
