@@ -10,6 +10,7 @@ async function startDb() {
         }  
         catch (error) {
             console.log("error in authentication"+error);
+            return false;
         } 
         console.log("Connected to the Database");
         try{
@@ -17,6 +18,7 @@ async function startDb() {
         }
         catch (error) {
             console.log("error in connecting to database");
+            return false;
         }
         console.log("Database synchronized");
         return true;

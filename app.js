@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 
+
 app.use(bodyParser.json());
 app.use(bodyParser.text());
 app.use(bodyParser.raw());
@@ -16,5 +17,7 @@ const assignmentRouter = require('./routes/assignmentRouter');
 // Use route definitions
 app.use('/healthz', healthzRoute);
 app.use('/v1/assignments', assignmentRouter);
-
+app.use('*',(req,res) => {
+    res.status(404).send();
+})
 module.exports = app;

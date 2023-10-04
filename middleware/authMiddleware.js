@@ -20,7 +20,7 @@ async function basicAuth(req,res,next) {
     console.log(password);
 
     const isValid = await isValidUser(username, password);
-    if(isValid){
+    if(isValid === true){
         req.userId = await getUserId(username);
         next();
     } else {
@@ -34,7 +34,7 @@ async function isValidUser(email, password) {
         const user = await Account.findOne({where: {email}});
 
         if(!user) {
-            return { success: false, message: 'User not found'}
+            return false;
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
