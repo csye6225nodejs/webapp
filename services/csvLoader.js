@@ -12,7 +12,7 @@ function LoadFromCSV() {
             return sequelize.sync();
         })
         .then(() => {
-            const filepath = path.join(__dirname, './../user.csv');
+            const filepath = path.join(__dirname, './../../user.csv');
             fs.createReadStream(filepath)
                 .pipe(csv())
                 .on('data', (row) => {

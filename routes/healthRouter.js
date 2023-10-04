@@ -4,18 +4,36 @@ const { healthcontroller } = require('../controllers/healthcontroller');
 
 // Health check route definition
 router.get('/', healthcontroller);
-/*router.post('/', (req, res) => {
-    res.status(400).send();
+
+router.get('*', (req, res) => {
+  res.status(404).send();
 });
+
 router.put('/', (req, res) => {
-    res.status(400).send('Not Found');
+    res.status(405).send();
   });
-  router.delete('/', (req, res) => {
-    res.status(400).send('Not Found');
-  });
-  router.patch('/', (req, res) => {
-    res.status(400).send('Not Found');
-  });*/
+
+router.post('/',(req,res) => {
+  res.status(405).send();
+});
+router.post('*', (req,res) => {
+  res.status(404).send();
+});
+router.put('*',(req,res) => {
+  res.status(404).send();
+});
+router.delete('/', (req, res) => {
+    res.status(405).send();
+});
+router.delete('*',(req,res) => {
+  res.status(404).send();
+});
+router.patch('/', (req, res) => {
+  res.status(405).send();
+});
+router.patch('',(req,res) => {
+  res.status(405).send();
+});
 
   
 module.exports = router;

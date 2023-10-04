@@ -12,14 +12,45 @@ async function getAllAccounts(req,res) {
         await sequelize.sync();
         const result = await account.findAll();
         res.status(200).json(result);   
+
    } catch(error)  {
        console.error('Failed to get all accounts : ', error);
    }; 
 }
 
+async function getAssignment(req,res) {
+        const assignmentId = req.params.id;
+
+        await sequelize.sync();
+        try {
+            const result = await assignment.findOne({
+              where: {
+                id: assignmentId, // Replace 'id' with the actual name of the primary key column
+              },
+            });
+          
+            if (!result) {
+              // The record with the specified assignmentId was found
+              res.status(404).send();
+            } else {
+              // No record with the specified assignmentId was found
+              res.status(200).send(result);
+            }
+          } catch (error) {
+            res.status(404).send();
+        }
+}
+
 async function getAllAssignments(req,res) {
     try{
 
+        if (req.body && Object.keys(req.body).length >0){
+            res.status(400).send();
+        }
+        const queryParams = req.query;
+        if (Object.keys(queryParams).length > 0) {
+            res.status(400).send();
+        }
         await sequelize.sync();
         const result = await assignment.findAll();
         res.status(200).json(result);   
@@ -32,9 +63,12 @@ async function addAssignment(req, res) {
     try {
         const { name, points, num_of_attempts, deadline} = req.body;
         const userId = req.userId;
-        if (!name || !points || !num_of_attempts || !deadline || !req.userId ) {
-            return res.status(400).json({ error: 'Missing required data in the request body' });
+        if(req.headers['Content-Type'] !== "application/json" ){
+            return res.status(400).send();
         }
+        if (!name || !points || !num_of_attempts || !deadline ) {
+            return res.status(400).send(); 
+        };
 
         await sequelize.sync();
 
@@ -49,10 +83,10 @@ async function addAssignment(req, res) {
 
         console.log('New Assignment:', newAssignment);
 
-        res.status(200).json(newAssignment);
+        res.status(201).send();
     } catch (error) {
         console.log('Failed to add an assignment: ' + error);
-        res.status(500).json({ error: 'Failed to add an assignment' });
+        res.status(400).send();
     }
 }
 
@@ -67,11 +101,16 @@ async function updateAssignment(req, res) {
 
         await sequelize.sync();
 
+        const Assignment = await assignment.findOne({where: {id: assignmentId}});
+        if(!assignment){
+            return res.status(404).send();
+        }
+
         // Check if the assignment with the provided ID exists and belongs to the authenticated user
         const existingAssignment = await assignment.findOne({ where: { id: assignmentId, userId } });
 
         if (!existingAssignment) {
-            return res.status(404).json({ error: 'Assignment not found' });
+            return res.status(403).send();
         }
 
         // Check if userId or assignmentId are provided in the request body
@@ -95,10 +134,10 @@ async function updateAssignment(req, res) {
 
         await existingAssignment.save(); // Save the changes to the database
 
-        res.status(200).json(existingAssignment);
+        res.status(204).send();
     } catch (error) {
         console.error('Failed to update an assignment: ' + error);
-        res.status(500).json({ error: 'Failed to update an assignment' });
+        res.status(400).send();
     }
 }
 
@@ -111,25 +150,25 @@ async function deleteAssignment(req, res) {
         const assign = await assignment.findByPk(assignmentId);
 
         if (!assign) {
-            return res.status(404).json({ error: 'Assignment not found' });
+            return res.status(404).send();
         }
 
         // Check if the assignment belongs to the authenticated user
         if (assign.userId !== userId) {
-            return res.status(401).json({ error: 'Unauthorized: Assignment does not belong to you' });
+            return res.status(403).send();
         }
 
         // Perform the delete operation
         await assign.destroy();
 
-        res.status(200).send(); // Respond with a success status and no content
+        res.status(204).send(); // Respond with a success status and no content
     } catch (error) {
         console.error('Failed to delete the assignment:', error);
-        res.status(500).json({ error: 'Failed to delete the assignment' });
+        res.status(400).send();
     }
 }
 
 
 
 
-module.exports = { getAllAccounts, getAllAssignments, addAssignment, updateAssignment, deleteAssignment };
+module.exports = { getAllAccounts, getAllAssignments, addAssignment, updateAssignment, deleteAssignment, getAssignment };
