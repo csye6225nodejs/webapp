@@ -10,8 +10,8 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: Abhi$3534
-          MYSQL_DATABASE: cloudschema
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -24,8 +24,3 @@ jobs:
         run: npm install
       - name: Run test
         run: npm test
-     
-
-
-
-
