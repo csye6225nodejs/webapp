@@ -6,7 +6,10 @@ const { LoadFromCSV } = require('./../services/csvLoader');
 
 // Define a controller for the health check route
 async function healthcontroller(req, res) {
-    res.setHeader('Cache-Control','no-cache');    
+    res.setHeader('Cache-Control','no-cache'); 
+    if (req.body && Object.keys(req.body).length >0){
+        res.status(405).send();
+    }
     const result = await startDb();
     if (result === false) {
         res.status(503).send();

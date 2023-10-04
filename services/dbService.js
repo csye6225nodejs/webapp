@@ -5,9 +5,19 @@ const Account = require('./../models/Account');
 // Function to start the database connection
 async function startDb() {
     try {
-        await sequelize.authenticate();
+        try{
+            await sequelize.authenticate();
+        }  
+        catch (error) {
+            console.log("error in authentication"+error);
+        } 
         console.log("Connected to the Database");
-        await sequelize.sync();
+        try{
+            await sequelize.sync();
+        }
+        catch (error) {
+            console.log("error in connecting to database");
+        }
         console.log("Database synchronized");
         return true;
     } catch (error) {
