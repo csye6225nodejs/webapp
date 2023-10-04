@@ -2,8 +2,8 @@ const mysql = require('mysql2/promise');
 
 const setupDatabase = async () => {
   const connection = await mysql.createConnection({
-    host: 'localhost',  // Change to the host where your MySQL server is running
-    user: 'root',       // Root user
+    host: process.env.DB_HOST,  // Change to the host where your MySQL server is running
+    user: process.env.DB_USER,       // Root user
     password: process.env.DB_PASSWORD,  // Set your desired root password
   });
 
