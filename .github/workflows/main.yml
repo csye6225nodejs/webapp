@@ -1,9 +1,9 @@
 name: NodeJS Integration tests
 
 on:
-  push:
+  pull_request:
     branches:
-      - assignment
+      - main
 
 jobs:
   build:
