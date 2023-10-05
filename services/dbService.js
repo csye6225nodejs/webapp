@@ -15,8 +15,7 @@ async function startDb() {
         console.log("Connected to the Database");
         try{
             await sequelize.sync();
-        }
-        catch (error) {
+        } catch (error) {
             console.log("error in connecting to database");
             return false;
         }
