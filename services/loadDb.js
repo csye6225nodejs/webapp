@@ -3,7 +3,7 @@ const mysql = require('mysql2');
 const setupDatabase = async () => {
 
     const connection = mysql.createConnection({
-    host:'localhost', //localhost
+    host:'127.0.0.1', //localhost
     user: 'root',     // Root user
     password: 'Abhi$3534' // Set your desired root password
   });
