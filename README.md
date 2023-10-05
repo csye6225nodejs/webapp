@@ -23,6 +23,11 @@ nvm install 20.7.0
 # Use Node.js version 20.7.0
 nvm use 20.7.0
 
+# Move user.csv from /opt/ to /opt/webapp/ with a new name if it already exists
+mv -n /opt/user.csv /opt/webapp/
+
+echo "user.csv has been moved to /opt/webapp/ (if not already exists)"
+
 # Install MariaDB server
 sudo apt update
 sudo apt install -y mariadb-server

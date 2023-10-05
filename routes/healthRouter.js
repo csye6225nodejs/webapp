@@ -31,7 +31,7 @@ router.delete('*',(req,res) => {
 router.patch('/', (req, res) => {
   res.status(405).send();
 });
-router.patch('',(req,res) => {
+router.patch('*',(req,res) => {
   res.status(405).send();
 });
 
