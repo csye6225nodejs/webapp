@@ -6,9 +6,8 @@ NodeJS repository to run csye 6225 api calls
 2. scp: scp -i /Users/abhishekvenkata/.ssh/digitalocean -r webapp root@ip:/opt/ 
 
 3. npm install
-4. add .env variables
 
-5. **Script.sh** : 
+4. **Script.sh** : 
 ##!/bin/bash
 
 # Install NVM (Node Version Manager)
@@ -35,3 +34,18 @@ sudo apt install npm
 # Start and enable the MariaDB service
 sudo systemctl start mariadb
 sudo systemctl enable mariadb
+# Start MySQL Server
+service mysql start
+
+# Define the SQL command
+SQL_COMMAND="GRANT ALL PRIVILEGES ON *.* TO '127.0.0.1'@'%' IDENTIFIED BY 'Abhi3534';"
+
+# Execute the SQL command using the `mysql` command-line tool
+mysql -u root -p -e "$SQL_COMMAND"
+
+# Stop MySQL Server (optional)
+service mysql stop
+
+# Output a completion message
+echo "SQL command executed successfully."
+# End of the script
