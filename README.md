@@ -49,3 +49,5 @@ service mysql stop
 # Output a completion message
 echo "SQL command executed successfully."
 # End of the script
+
+test
