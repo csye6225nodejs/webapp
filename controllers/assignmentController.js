@@ -99,6 +99,30 @@ async function updateAssignment(req, res) {
             return res.status(400).json({ error: 'Missing assignment ID or user ID' });
         }
 
+        const { name, points, num_of_attempts, deadline } = req.body;
+
+        if (!name || (!name.match(/^[A-Za-z0-9\s]+$/) && typeof name !== 'number')) {
+            return res.status(400).send("Invalid name");
+        }
+
+        if (isNaN(points) || typeof points !== 'number') {
+            return res.status(400).send("Invalid points");
+        }
+
+        if (isNaN(num_of_attempts) || typeof num_of_attempts !== 'number') {
+            return res.status(400).send("Invalid num_of_attempts");
+        }
+
+        if (!deadline) {
+            return res.status(400).send("Missing deadline");
+        }
+
+        const deadlineDate = new Date(deadline);
+        if (isNaN(deadlineDate) || deadlineDate <= new Date()) {
+            return res.status(400).send("Invalid or past deadline");
+        }
+
+
         await sequelize.sync();
 
         const Assignment = await assignment.findOne({where: {id: assignmentId}});

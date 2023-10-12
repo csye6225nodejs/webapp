@@ -21,7 +21,7 @@ router.delete('/',(req,res) => {
     res.status(400).send();
 });
 router.delete('/:id', authMiddleware.basicAuth, assignmentController.deleteAssignment);
-router.patch(':/id',(req,res) => {
+router.patch('/:id',(req,res) => {
     res.status(405).send();});
 
 router.get("*",(req,res) => {
