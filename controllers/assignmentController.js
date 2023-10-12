@@ -19,13 +19,13 @@ async function getAllAccounts(req,res) {
 }
 
 async function getAssignment(req,res) {
-        const assignmentId = req.params.id;
+        const assignmentId = req.params.uuid;
 
         await sequelize.sync();
         try {
             const result = await assignment.findOne({
               where: {
-                id: assignmentId, // Replace 'id' with the actual name of the primary key column
+                uuid: assignmentId, // Replace 'id' with the actual name of the primary key column
               },
             });
           
@@ -63,12 +63,30 @@ async function addAssignment(req, res) {
     try {
         const { name, points, num_of_attempts, deadline} = req.body;
         const userId = req.userId;
-        if(req.headers['Content-Type'] !== "application/json" ){
-            return res.status(400).send();
-        }
         if (!name || !points || !num_of_attempts || !deadline ) {
             return res.status(400).send(); 
         };
+
+        if (!name && !(name.match(/^[A-Za-z0-9\s]+$/) )) {
+            return res.status(400).send("Invalid name");
+        }
+
+        if (isNaN(points) || typeof points !== 'number') {
+            return res.status(400).send("Invalid points");
+        }
+
+        if (isNaN(num_of_attempts) || typeof num_of_attempts !== 'number') {
+            return res.status(400).send("Invalid num_of_attempts");
+        }
+
+        if (!deadline) {
+            return res.status(400).send("Missing deadline");
+        }
+
+        const deadlineDate = new Date(deadline);
+        if (isNaN(deadlineDate) || deadlineDate <= new Date()) {
+            return res.status(400).send("Invalid or past deadline");
+        }
 
         await sequelize.sync();
 
@@ -83,7 +101,7 @@ async function addAssignment(req, res) {
 
         console.log('New Assignment:', newAssignment);
 
-        res.status(201).send();
+        res.status(201).send(newAssignment);
     } catch (error) {
         console.log('Failed to add an assignment: ' + error);
         res.status(400).send();
@@ -95,13 +113,18 @@ async function updateAssignment(req, res) {
         const assignmentId = req.params.id; // Assuming you pass the assignment ID as a route parameter
         const userId = req.userId;
 
+        console.log(assignmentId);
+        console.log(userId);
         if (!assignmentId || !userId) {
             return res.status(400).json({ error: 'Missing assignment ID or user ID' });
         }
 
         const { name, points, num_of_attempts, deadline } = req.body;
 
-        if (!name || (!name.match(/^[A-Za-z0-9\s]+$/) && typeof name !== 'number')) {
+        if (!name || !points || !num_of_attempts || !deadline ) {
+            return res.status(400).send("missing values"); 
+        };
+        if (!name && !(name.match(/^[A-Za-z0-9\s]+$/) )) {
             return res.status(400).send("Invalid name");
         }
 
@@ -125,13 +148,13 @@ async function updateAssignment(req, res) {
 
         await sequelize.sync();
 
-        const Assignment = await assignment.findOne({where: {id: assignmentId}});
+        const Assignment = await assignment.findOne({where: {uuid: assignmentId}});
         if(!assignment){
             return res.status(404).send();
         }
 
         // Check if the assignment with the provided ID exists and belongs to the authenticated user
-        const existingAssignment = await assignment.findOne({ where: { id: assignmentId, userId } });
+        const existingAssignment = await assignment.findOne({ where: { uuid: assignmentId, userId } });
 
         if (!existingAssignment) {
             return res.status(403).send();
@@ -158,10 +181,10 @@ async function updateAssignment(req, res) {
 
         await existingAssignment.save(); // Save the changes to the database
 
-        res.status(204).send();
+        res.status(204).send(existingAssignment);
     } catch (error) {
         console.error('Failed to update an assignment: ' + error);
-        res.status(400).send();
+        res.status(400).send("HI");
     }
 }
 

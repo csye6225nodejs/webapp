@@ -2,6 +2,12 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('./../config/dbconfig');
 
 const Assignment = sequelize.define('assignment',{
+    uuid: {
+        type: DataTypes.INTEGER,
+        primaryKey: true, // Set this column as the primary key
+        autoIncrement: true,
+        allowNull: false,
+    },
     name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -31,6 +37,10 @@ const Assignment = sequelize.define('assignment',{
         type: DataTypes.INTEGER,
         allowNull: false,
     }
+},{
+        timestamps: true, // Set this to false to disable automatic timestamps
+        createdAt: 'assignment_created', // Rename the createdAt field
+        updatedAt: 'assignment_updated' // Rename the updatedAt field
 });
 
 module.exports = Assignment;
