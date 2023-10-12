@@ -49,3 +49,26 @@ service mysql stop
 # Output a completion message
 echo "SQL command executed successfully."
 # End of the script
+
+
+# Entire script.sh file:
+autorun.sh:
+
+#!/bin/bash
+curl -o- https: / /raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+source ~/ .nvm/nvm.sh nvm 
+Install 20.7.0
+nvm use 20.7.0
+sudo apt update
+sudo apt install -y mariadb-server
+sudo apt install npm
+sudo systemctl start mariadb
+sudo systemctl enable mariadb
+mv -n /opt/user.csv /opt/webapp 
+echo “user.csv has been moved”
+service mysql start
+mysql -u root <<MYSQL_SCRIPT
+CREATE DATABASE IF NOT EXISTS cloudschema;
+ALTER USER ‘root’@’localhost’ IDENTIFIED BY ‘Abhi\$3534’
+
+MYSQL_SCRIPT
