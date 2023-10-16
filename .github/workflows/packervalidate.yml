@@ -1,9 +1,9 @@
-name: Packer Validate
+name: Check Packer Validate
 
-on:
-  push:
+on: 
+  pull_request:
     branches:
-      - main # Adjust this to your main branch name
+      - main
 
 jobs:
   validate_packer:
