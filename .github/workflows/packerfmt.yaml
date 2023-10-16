@@ -14,6 +14,9 @@ jobs:
     - name: Check out the code
       uses: actions/checkout@v2
 
+    - name: Set up Packer
+      uses: hashicorp/setup-packer@main
+
     - name: Run Packer fmt
       id: packer_fmt
       run: |
@@ -21,14 +24,14 @@ jobs:
         packer fmt .
         changes=$(git diff --name-only)
         if [ "$modified_files" != "$changes" ]; then
-          echo "::set-output name=changes::true"
+        echo "::set-output name=changes::true"
         fi
       shell: bash
 
     - name: Check for Packer template changes
       run: |
         if [[ "${{ steps.packer_fmt.outputs.changes }}" == "true" ]]; then
-          echo "Packer template was modified. Workflow failed."
-          exit 1
+        echo "Packer template was modified. Workflow failed."
+        exit 1
         fi
       if: steps.packer_fmt.outputs.changes == 'true'
