@@ -1,30 +1,34 @@
-name: Packer Format Check
+name: Check Packer Template Formatting
 
-on:
+on: 
   pull_request:
     branches:
-        main
-    types:
-      - opened
-      - synchronize
+      - main
+
 
 jobs:
-  format-check:
+  check_packer_template:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Check out the code
+      uses: actions/checkout@v2
 
-      - name: Install Packer
-        run: |
-          wget https://releases.hashicorp.com/packer/1.7.2/packer_1.7.2_linux_amd64.zip
-          unzip packer_1.7.2_linux_amd64.zip
-          chmod +x packer
-          sudo mv packer /usr/local/bin/
-        if: success()
+    - name: Run Packer fmt
+      id: packer_fmt
+      run: |
+        modified_files=$(git diff --name-only)
+        packer fmt .
+        changes=$(git diff --name-only)
+        if [ "$modified_files" != "$changes" ]; then
+          echo "::set-output name=changes::true"
+        fi
+      shell: bash
 
-      - name: Run Packer fmt
-        run: |
-          packer fmt .
-        if: success()
+    - name: Check for Packer template changes
+      run: |
+        if [[ "${{ steps.packer_fmt.outputs.changes }}" == "true" ]]; then
+          echo "Packer template was modified. Workflow failed."
+          exit 1
+        fi
+      if: steps.packer_fmt.outputs.changes == 'true'

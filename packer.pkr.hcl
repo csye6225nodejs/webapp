@@ -7,6 +7,7 @@ packer {
   }
 }
 
+
 source "amazon-ebs" "debian" {
   ami_name      = "debian-12-ami-{{timestamp}}"
   instance_type = "t2.micro"
@@ -16,7 +17,7 @@ source "amazon-ebs" "debian" {
     filters = {
       "virtualization-type" = "hvm"
       "architecture"        = "x86_64"
-      "name"                = "debian-12*"
+      "name"                = "debian-14*"
       "root-device-type"    = "ebs"
     }
     most_recent = true
