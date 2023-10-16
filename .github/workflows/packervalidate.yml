@@ -6,7 +6,8 @@ on:
       - main
 
 jobs:
-  validate_packer:
+  build:
+    name: validate and fmt for packer
     runs-on: debian-latest
 
     steps:
