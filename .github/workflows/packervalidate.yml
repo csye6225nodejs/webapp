@@ -1,4 +1,4 @@
-name: Check Packer Validate
+name: Check Packer Format and Validate
 
 on: 
   pull_request:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   validate_packer:
-    runs-on: ubuntu-latest
+    runs-on: debian-latest
 
     steps:
     - name: Checkout code
@@ -15,10 +15,15 @@ jobs:
 
     - name: Set up Packer
       uses: hashicorp/setup-packer@main
-
+      id  : setup
+      with:
+        version : latest
 
     - name: Initialize Packer
       run: packer init .
+    
+    - name: Run Packer format check
+      uses: packer fmt -check=true
 
     - name: Validate Packer Config
       run: packer validate packer.pkr.hcl
