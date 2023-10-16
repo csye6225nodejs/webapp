@@ -1,13 +1,13 @@
 name: Check Packer Format and Validate
 
-on: 
+on:
   pull_request:
     branches:
       - main
 
 jobs:
   build:
-    name: validate and fmt for packer
+    name: validate and fmt for Packer
     runs-on: ubuntu-latest
 
     steps:
@@ -15,22 +15,25 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Set up Packer
-      uses: hashicorp/setup-packer@main
-      id  : setup
+      uses: hashicorp/setup-packer@v1
       with:
-        version : latest
+        version: latest
 
     - name: Initialize Packer
       run: packer init .
-    
-    - name: Run Packer format check
+
+    - name: Format Packer Config
+      run: packer fmt .
+      id: fmt
+
+    - name: Check for Formatting Changes
       run: |
-        if ! packer fmt -check=true; then
-        echo "Packer format check failed."
-        exit 1
+        CHANGES=$(git diff --name-only)
+        if [[ -n "$CHANGES" ]]; then
+          echo "Packer format check failed. The following files have formatting changes:"
+          echo "$CHANGES"
+          exit 1
         fi
 
     - name: Validate Packer Config
       run: packer validate packer.pkr.hcl
-        
-
