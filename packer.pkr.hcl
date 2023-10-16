@@ -7,7 +7,6 @@ packer {
   }
 }
 
-
 source "amazon-ebs" "debian" {
   ami_name      = "debian-12-ami-{{timestamp}}"
   instance_type = "t2.micro"
