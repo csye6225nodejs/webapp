@@ -20,7 +20,7 @@ source "amazon-ebs" "debian" {
       "name"                = "debian-14*"
       "root-device-type"    = "ebs"
     }
-    most_recent = 
+    most_recent = true
     owners      = ["amazon"] # Debian 12.0 is owned by the official Debian AMI account
   }
   ssh_username = "admin"
