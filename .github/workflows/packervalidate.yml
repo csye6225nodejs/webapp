@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: validate and fmt for packer
-    runs-on: debian-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
@@ -24,7 +24,11 @@ jobs:
       run: packer init .
     
     - name: Run Packer format check
-      uses: packer fmt -check=true
+      run: |
+        if ! packer fmt -check=true; then
+        echo "Packer format check failed."
+        exit 1
+        fi
 
     - name: Validate Packer Config
       run: packer validate packer.pkr.hcl
