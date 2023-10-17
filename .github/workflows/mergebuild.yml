@@ -1,0 +1,40 @@
+name: Packer Build on PR Merge/Rebase
+
+on:
+  pull_request:
+    types:
+      - synchronize
+      - closed
+
+jobs:
+  packer_build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check if PR is merged
+      id: pr_merged
+      run: echo ::set-output name=merged::${{ github.event.pull_request.merged }}
+      
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up AWS CLI
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-2 # Replace with your desired region
+
+    - name: Run Packer build
+      if: steps.pr_merged.outputs.merged == 'true'
+      run: packer build -var 'timestamp=$(date +%s)' packer.pkr.hcl
+
+
+    - name: Upload artifacts
+      if: steps.pr_merged.outputs.merged == 'true'
+      uses: actions/upload-artifact@v2
+      with:
+        name: packer-ami
+        path: $GITHUB_WORKSPACE/artifacts/
+    
+        # Replace 'path/to/your/packer/build/artifacts' with the actual path to your Packer build artifacts
