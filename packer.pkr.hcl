@@ -34,13 +34,14 @@ build {
   name    = "webapp"
   sources = ["source.amazon-ebs.debian"]
 
-provisioner "file" {
-  source      = "{{coalesce(user `artifact_path`, '')}}"
-  destination = "/home/admin/webapp.zip"
-}
+  provisioner "file" {
+    source      = var.artifact_path != null ? var.artifact_path : ""
+    destination = "/home/admin/webapp.zip"
+  }
 
-provisioner "shell" {
-  script = "install-app-dependencies.sh" # Point to your shell script file
-}
+
+  provisioner "shell" {
+    script = "install-app-dependencies.sh" # Point to your shell script file
+  }
 
 }
