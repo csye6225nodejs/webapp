@@ -40,6 +40,7 @@ build {
   }
 
 
+
   provisioner "shell" {
     script = "install-app-dependencies.sh" # Point to your shell script file
   }
