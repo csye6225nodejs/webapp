@@ -8,10 +8,10 @@ packer {
 }
 
 source "amazon-ebs" "debian" {
-  ami_name      =  "debian-12-ami-{{timestamp}}"
+  ami_name      = "debian-12-ami-{{timestamp}}"
   instance_type = "t2.micro"
-  region        =     "us-east-2"
-  vpc_id        =    "vpc-0423e97164c82d13d"
+  region        = "us-east-2"
+  vpc_id        = "vpc-0423e97164c82d13d"
   source_ami_filter {
     filters = {
       "virtualization-type" = "hvm"
