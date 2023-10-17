@@ -15,8 +15,8 @@ source "amazon-ebs" "debian" {
   source_ami_filter {
     filters = {
       "virtualization-type" = "hvm"
-      "architecture"        =      "x86_64"
-      "name"                = "debian-14*"
+      "architecture"        = "x86_64"
+      "name"                = "debian-12*"
       "root-device-type"    = "ebs"
     }
     most_recent = true
