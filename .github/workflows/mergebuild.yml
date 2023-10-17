@@ -1,40 +1,71 @@
-name: Packer Build on PR Merge/Rebase
+name: AMI Build
 
 on:
   pull_request:
     types:
-      - synchronize
       - closed
+    branches:
+        - main
 
 jobs:
-  packer_build:
+  build:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-
-    steps:
-    - name: Check if PR is merged
-      id: pr_merged
-      run: echo ::set-output name=merged::${{ github.event.pull_request.merged }}
-      
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Set up AWS CLI
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-2 # Replace with your desired region
-
-    - name: Run Packer build
-      if: steps.pr_merged.outputs.merged == 'true'
-      run: packer build -var 'timestamp=$(date +%s)' packer.pkr.hcl
-
-
-    - name: Upload artifacts
-      if: steps.pr_merged.outputs.merged == 'true'
-      uses: actions/upload-artifact@v2
-      with:
-        name: packer-ami
-        path: $GITHUB_WORKSPACE/artifacts/
+    name: AMI Build
     
-        # Replace 'path/to/your/packer/build/artifacts' with the actual path to your Packer build artifacts
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: Abhi$3534
+          MYSQL_DATABASE: cloudschema
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies check
+        run: npm install
+
+      - name: Run testing
+        run: npm test
+
+      - name: "Setup .env file"
+        run: |
+          touch .env
+          echo PGDATABASE="abcd" >> .env
+
+      - name: Run tests
+        run: npm run test:integration
+
+      - name: Zip Repository
+        run: |
+          zip -r webapp.zip . .env
+          mkdir -p zip
+          mv webapp.zip zip/
+
+      - name: Setup Packer
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+          version: "latest"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Run Packer init
+        id: init
+        run: |
+          packer init packer.pkr.hcl
+
+      - name: Build AMI
+        run: |
+            packer build -var "artifact=zip/webapp.zip" packer.pkr.hcl
