@@ -37,11 +37,11 @@ sudo systemctl enable mariadb
 sudo systemctl start mysql
 
 #service mysql start
-mysql -u root <<MYSQL_SCRIPT
-CREATE DATABASE IF NOT EXISTS cloudschema;
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'Abhi\$3534'
+#mysql -u root <<MYSQL_SCRIPT
+#CREATE DATABASE IF NOT EXISTS cloudschema;
+#ALTER USER 'root'@'localhost' IDENTIFIED BY 'Abhi\$3534'
 
-MYSQL_SCRIPT
+#MYSQL_SCRIPT
 
 
 # Start your application (you should use the appropriate command for your application)
