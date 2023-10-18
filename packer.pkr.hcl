@@ -11,10 +11,18 @@ variable "artifact" {
   default = "" # Set your default value
 }
 
+variable "region" {
+  default = "us-east-2"
+}
+
+variable "instance_type" {
+  default = "t2.micro"
+}
+
 source "amazon-ebs" "debian" {
   ami_name      = "debian-12-ami-{{timestamp}}"
-  instance_type = "t2.micro"
-  region        = "us-east-2"
+  instance_type = var.instance_type
+  region        = var.region
   ami_users     = ["908593341105", "064412371858"]
   source_ami_filter {
     filters = {
