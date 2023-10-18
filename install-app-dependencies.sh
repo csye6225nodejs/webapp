@@ -28,7 +28,7 @@ sudo apt install -y mariadb-server
 sudo apt install -y npm
 
 # Install application dependencies using npm
-#npm install
+npm install
 
 # Start MariaDB service
 sudo systemctl start mariadb
