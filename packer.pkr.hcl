@@ -6,12 +6,7 @@ packer {
     }
   }
 }
-
-
-variables {
-  artifact_path = null
-}
-
+variable "artifact" {}
 
 source "amazon-ebs" "debian" {
   ami_name      = "debian-12-ami-{{timestamp}}"
@@ -35,7 +30,7 @@ build {
   sources = ["source.amazon-ebs.debian"]
 
   provisioner "file" {
-    source      = var.artifact_path != null ? var.artifact_path : ""
+    source      = var.artifact != null ? var.artifact : ""
     destination = "/home/admin/webapp.zip"
   }
 
