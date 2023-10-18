@@ -26,7 +26,7 @@ sudo apt update
 sudo apt install -y mariadb-server
 sudo apt install -y npm
 
-npm start
+npm install
 
 
 sudo mysql -u root <<MYSQL_SCRIPT
