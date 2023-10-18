@@ -54,7 +54,7 @@ build {
       "DEBIAN_FRONTEND=noninteractive",
       "CHECKPOINT_DISABLE=1"
     ]
-    
+
     script = "install-app-dependencies.sh" # Point to your shell script file
   }
 
