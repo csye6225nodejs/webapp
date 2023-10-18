@@ -31,21 +31,4 @@ sudo apt install -y npm
 npm install
 
 # Start MariaDB service
-sudo systemctl start mariadb
-sudo systemctl enable mariadb
 
-sudo systemctl stop mariadb
-
-sudo apt-get purge mariadb-server mariadb-client mariadb-common
-sudo apt-get autoremove
-sudo apt-get update
-sudo apt-get install mariadb-server
-sudo systemctl start mariadb
-sudo systemctl enable mariadb
-
-
-mysql -u root <<MYSQL_SCRIPT
-CREATE DATABASE IF NOT EXISTS cloudschema;
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'Abhi\$3534'
-
-MYSQL_SCRIPT
