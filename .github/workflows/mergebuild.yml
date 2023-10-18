@@ -43,6 +43,9 @@ jobs:
       - name: Run tests
         run: npm run test
 
+      - name: Remove node modules
+        run: rm -rf node_modules
+        
       - name: Zip web application
         run: |
           cd ${{ github.workspace }}
