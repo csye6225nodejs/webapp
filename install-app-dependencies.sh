@@ -18,8 +18,8 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 source ~/.nvm/nvm.sh nvm
 
 # Install Node.js version 20.7.0 (assuming it's a valid version)
-nvm install 20.7.0
-nvm use 20.7.0
+sudo nvm install 20.7.0
+sudo nvm use 20.7.0
     
 # Update package lists
 sudo apt update
@@ -27,7 +27,7 @@ sudo apt update
 sudo apt install -y mariadb-server
 sudo apt install -y npm
 
-npm install
+sudo npm install
 
 
 sudo apt-get remove git -y
