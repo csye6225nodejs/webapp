@@ -1,14 +1,15 @@
 #!/bin/bash
 
 
+sudo mv /tmp/webapp.zip /opt/webapp.zip
+cd /opt || exit
+
 sudo apt update
 sudo apt install unzip
 
-cd /home/admin || exit
-mkdir webapp
-unzip /home/admin/webapp.zip -d /home/admin/webapp
-
-cd /home/admin/webapp || exit
+sudo unzip webapp.zip -d webapp
+sudo chmod 755 /opt/webapp
+cd /opt/webapp || exit
 
 # Install NVM
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
@@ -29,10 +30,14 @@ sudo apt install -y npm
 npm install
 
 
+sudo apt-get remove git -y
+sudo apt-get clean
 sudo mysql -u root <<MYSQL_SCRIPT
 CREATE DATABASE IF NOT EXISTS cloudschema;
 ALTER USER 'root'@'localhost' IDENTIFIED BY 'Abhi\$3534'
 
 MYSQL_SCRIPT
+
+
 # Start MariaDB service
 

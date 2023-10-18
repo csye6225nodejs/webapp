@@ -42,13 +42,19 @@ build {
   sources = ["source.amazon-ebs.debian"]
 
   provisioner "file" {
-    source      = var.artifact != null ? var.artifact : ""
-    destination = "/home/admin/webapp.zip"
+    source      = "${var.artifact}"
+    destination = "tmp/webapp.zip"
   }
 
 
 
   provisioner "shell" {
+
+    environment_vars = [
+      "DEBIAN_FRONTEND=noninteractive",
+      "CHECKPOINT_DISABLE=1"
+    ]
+    
     script = "install-app-dependencies.sh" # Point to your shell script file
   }
 
