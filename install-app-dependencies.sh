@@ -22,13 +22,18 @@ nvm use 20.7.0
     
 # Update package lists
 sudo apt update
-
 # Install MariaDB and npm
 sudo apt install -y mariadb-server
 sudo apt install -y npm
 
-# Install application dependencies using npm
-npm install
+sudo systemctl start mariadb
+sudo systemctl enable mariadb
 
+
+sudo mysql -u root <<MYSQL_SCRIPT
+CREATE DATABASE IF NOT EXISTS cloudschema;
+ALTER USER ‘root’@’localhost’ IDENTIFIED BY ‘Abhi\$3534’
+
+MYSQL_SCRIPT
 # Start MariaDB service
 
