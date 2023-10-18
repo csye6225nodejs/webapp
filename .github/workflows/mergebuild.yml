@@ -71,6 +71,6 @@ jobs:
       - name: Build AMI
         run: |
           packer build -var 'instance_type=t2.micro' \
-                    -var 'zip_file_name=${{ github.workspace }}/webapp.zip' \
-                    aws-debian.pkr.hcl
+                    -var 'artifact=${{ github.workspace }}/webapp.zip' \
+                    packer.pkr.hcl
         working-directory: ${{ github.workspace }}
