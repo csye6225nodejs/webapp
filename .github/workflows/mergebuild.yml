@@ -68,9 +68,11 @@ jobs:
         run: |
           packer init packer.pkr.hcl
 
-      - name: Build AMI
+      - name: Packer build
         run: |
-          packer build -var 'instance_type=t2.micro' \
+            packer build -var 'source_ami=ami-06db4d78cb1d3bbf9' \
+                    -var 'subnet_id=subnet-04097cdffea4849f6' \
+                    -var 'instance_type=t2.micro' \
                     -var 'artifact=${{ github.workspace }}/webapp.zip' \
                     packer.pkr.hcl
         working-directory: ${{ github.workspace }}
