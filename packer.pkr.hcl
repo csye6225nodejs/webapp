@@ -6,7 +6,10 @@ packer {
     }
   }
 }
-variable "artifact" {}
+
+variable "artifact" {
+  default = "" # Set your default value
+}
 
 source "amazon-ebs" "debian" {
   ami_name      = "debian-12-ami-{{timestamp}}"
