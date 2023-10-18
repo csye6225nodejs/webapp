@@ -15,7 +15,7 @@ source "amazon-ebs" "debian" {
   ami_name      = "debian-12-ami-{{timestamp}}"
   instance_type = "t2.micro"
   region        = "us-east-2"
-  ami_users     = ["908593341105","064412371858"]
+  ami_users     = ["908593341105", "064412371858"]
   source_ami_filter {
     filters = {
       "virtualization-type" = "hvm"
