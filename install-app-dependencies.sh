@@ -14,7 +14,7 @@ cd /home/admin/webapp || exit
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 
 # Source NVM (you don't need to provide 'nvm' as an argument)
-source ~/.nvm/nvm.sh
+source ~/.nvm/nvm.sh nvm
 
 # Install Node.js version 20.7.0 (assuming it's a valid version)
 nvm install 20.7.0
@@ -34,7 +34,7 @@ npm install
 sudo systemctl start mariadb
 sudo systemctl enable mariadb
 
-sudo service mysql start
+service mysql start
 mysql -u root <<MYSQL_SCRIPT
 CREATE DATABASE IF NOT EXISTS cloudschema;
 ALTER USER 'root'@'localhost' IDENTIFIED BY 'Abhi\$3534'
