@@ -43,12 +43,12 @@ jobs:
       - name: Run tests
         run: npm run test
 
-      - name: Zip Repository  
+      - name: Zip web application
         run: |
-          
-          zip -r webapp.zip ${{github.workspace}} .env
-          mkdir -p zip
-          mv webapp.zip zip/
+          cd ${{ github.workspace }}
+          zip -r webapp.zip .
+          ls -l
+        working-directory: ${{ github.workspace }}
 
       - name: Setup Packer
         uses: hashicorp/setup-packer@main
