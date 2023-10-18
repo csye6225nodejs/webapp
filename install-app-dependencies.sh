@@ -34,9 +34,16 @@ npm install
 sudo systemctl start mariadb
 sudo systemctl enable mariadb
 
-#sudo systemctl start mysql
+npm install
 
-#service mysql start
+# Start MariaDB service
+sudo systemctl start mariadb
+sudo systemctl enable mariadb
+
+sudo systemctl start mysql
+sudo systemctl stop mysql
+sudo mysqld_safe --skip-grant-tables &
+
 mysql -u root <<MYSQL_SCRIPT
 CREATE DATABASE IF NOT EXISTS cloudschema;
 ALTER USER 'root'@'localhost' IDENTIFIED BY 'Abhi\$3534'
