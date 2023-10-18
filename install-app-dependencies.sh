@@ -31,7 +31,7 @@ npm install
 
 sudo mysql -u root <<MYSQL_SCRIPT
 CREATE DATABASE IF NOT EXISTS cloudschema;
-ALTER USER ‘root’@’localhost’ IDENTIFIED BY ‘Abhi\$3534’
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'Abhi\$3534'
 
 MYSQL_SCRIPT
 # Start MariaDB service
