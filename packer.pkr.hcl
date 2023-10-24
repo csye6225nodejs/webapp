@@ -12,12 +12,12 @@ variable "source_ami" {
   default = "ami-06db4d78cb1d3bbf9"
 }
 
-variable "region" {
+  variable "region" {
   type    = string
   default = "us-east-2"
 }
 
-variable "subnet_id" {
+  variable "subnet_id" {
   type    = string
   default = "subnet-04097cdffea4849f6"
 }
