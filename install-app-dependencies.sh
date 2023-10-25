@@ -32,12 +32,15 @@ sudo npm install
 
 sudo apt-get remove git -y
 sudo apt-get clean
-sudo mysql -u root <<MYSQL_SCRIPT
-CREATE DATABASE IF NOT EXISTS cloudschema;
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'Abhi\$3534'
+
+#sudo mysql -u root <<MYSQL_SCRIPT
+#CREATE DATABASE IF NOT EXISTS cloudschema;
+#ALTER USER 'root'@'localhost' IDENTIFIED BY 'Abhi\$3534'
 
 
-MYSQL_SCRIPT
+#MYSQL_SCRIPT
+
+sudo mv /tmp/webapp.service /etc/systemd/system/webapp.service
 
 
 # Start MariaDB service
