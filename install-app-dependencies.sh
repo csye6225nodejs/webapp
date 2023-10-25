@@ -1,15 +1,17 @@
 #!/bin/bash
 
+sudo groupadd csye6225
+sudo useradd -s /bin/false -g csye6225group -d /opt/csye6225dir -m csye6225user
 
-sudo mv /tmp/webapp.zip /opt/webapp.zip
-cd /opt || exit
+sudo mv /tmp/webapp.zip /opt/csye6225dir/webapp.zip
+cd /opt/csye6225dir || exit
 
 sudo apt update
 sudo apt install unzip
 
 sudo unzip webapp.zip -d webapp
-sudo chmod 755 /opt/webapp
-cd /opt/webapp || exit
+sudo chmod 750 /opt/csye6225dir/webapp
+cd /opt/csye6225dir/webapp || exit
 
 # Install NVM
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
@@ -33,12 +35,6 @@ sudo npm install
 sudo apt-get remove git -y
 sudo apt-get clean
 
-#sudo mysql -u root <<MYSQL_SCRIPT
-#CREATE DATABASE IF NOT EXISTS cloudschema;
-#ALTER USER 'root'@'localhost' IDENTIFIED BY 'Abhi\$3534'
-
-
-#MYSQL_SCRIPT
 
 sudo mv /tmp/webapp.service /etc/systemd/system/webapp.service
 
