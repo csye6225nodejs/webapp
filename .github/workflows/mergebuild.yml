@@ -29,13 +29,8 @@ jobs:
       - name: Install dependencies check
         run: npm install
 
-      - name: "Setup .env file"
-        run: |
-          touch .env
-          echo PGDATABASE="abcd" >> .env
-
-      #- name: Run tests
-      #  run: npm run test
+      - name: Run tests
+        run: npm run test
 
       - name: Remove node modules
         run: rm -rf node_modules

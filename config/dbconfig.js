@@ -1,12 +1,12 @@
 const Sequelize = require('sequelize');
 
-const dbName = "cloudschema";
-const dbUser = "root";
-const dbPassword = "Abhi$3534";
-const dbHost = "127.0.0.1";
+const DB_NAME = "cloudschema";
+const DB_USER = "root";
+const DB_PASSWORD = "Abhi$3534";
+const DB_HOST = "127.0.0.1";
 
-const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
-    host: dbHost,
+const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+    host: DB_HOST,
     dialect: 'mysql',
 });
 
