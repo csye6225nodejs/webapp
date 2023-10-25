@@ -1,0 +1,17 @@
+[Unit]
+Description="Node Js Webapp 6225 Service"
+After=network.target
+Wants=mysqld.service
+
+[Service]
+EnvironmentFile=/opt/webapp/.env
+Type=simple
+User=admin
+Restart=always
+RestartSec=100ms
+StartLimitInterval=0
+WorkingDirectory=/opt/webapp
+ExecStart=/usr/bin/npm start
+
+[Install]
+WantedBy=cloud-init.target
