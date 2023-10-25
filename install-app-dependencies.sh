@@ -1,6 +1,8 @@
 #!/bin/bash
 
 sudo groupadd csye6225
+sudo mkdir /opt/csye6225dir
+
 sudo useradd -s /bin/false -g csye6225group -d /opt/csye6225dir -m csye6225user
 
 sudo mv /tmp/webapp.zip /opt/csye6225dir/webapp.zip
