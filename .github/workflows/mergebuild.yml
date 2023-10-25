@@ -32,6 +32,10 @@ jobs:
       - name: Install dependencies check
         run: npm install
 
+      - name: "Setup .env file"
+        run: |
+          touch .env
+
       - name: Run tests
         run: npm run test
 
