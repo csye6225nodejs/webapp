@@ -4,13 +4,13 @@ After=network.target
 Wants=mysqld.service
 
 [Service]
-EnvironmentFile=/opt/csye6225dir/webapp/.env
+EnvironmentFile=/opt/webapp/.env
 Type=simple
-User=csye6225user
+User=admin
 Restart=always
 RestartSec=100ms
 StartLimitInterval=0
-WorkingDirectory=/opt/csye6225dir/webapp/
+WorkingDirectory=/opt/webapp
 ExecStart=/usr/bin/npm start
 
 [Install]

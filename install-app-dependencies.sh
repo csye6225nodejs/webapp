@@ -12,8 +12,8 @@ sudo apt update
 sudo apt install unzip
 
 sudo unzip webapp.zip -d webapp
-sudo chmod 755 /opt/csye6225dir/webapp
-cd /opt/csye6225dir/webapp || exit
+sudo chmod 755 /opt/webapp
+sudo cd /opt/csye6225dir/webapp || exit
 
 # Install NVM
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
