@@ -1,6 +1,7 @@
 #!/bin/bash
 
-
+sudo groupadd csye6225group
+sudo useradd -s /bin/false -g csye6225group -d /opt -m csye6225user
 sudo mv /tmp/webapp.zip /opt/webapp.zip
 cd /opt || exit
 
