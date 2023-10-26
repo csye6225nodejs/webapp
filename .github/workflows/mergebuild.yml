@@ -2,17 +2,14 @@ name: AMI Build
 
 on:
   pull_request:
-    types:
-      - closed
     branches:
-        - main
+      - main
 
 jobs:
   build:
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
     name: AMI Build
-    
+    runs-on: ubuntu-latest
+
     services:
       mysql:
         image: mysql:5.7
