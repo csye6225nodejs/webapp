@@ -1,19 +1,15 @@
 #!/bin/bash
 
-sudo groupadd csye6225
-sudo mkdir /opt/csye6225dir
 
-sudo useradd -s /bin/false -g csye6225group -d /opt/csye6225dir -m csye6225user
-
-sudo mv /tmp/webapp.zip /opt/csye6225dir/webapp.zip
-cd /opt/csye6225dir || exit
+sudo mv /tmp/webapp.zip /opt/webapp.zip
+cd /opt || exit
 
 sudo apt update
 sudo apt install unzip
 
 sudo unzip webapp.zip -d webapp
 sudo chmod 755 /opt/webapp
-sudo cd /opt/csye6225dir/webapp || exit
+cd /opt/webapp || exit
 
 # Install NVM
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
@@ -36,6 +32,7 @@ sudo npm install
 
 sudo apt-get remove git -y
 sudo apt-get clean
+
 
 
 sudo mv /tmp/webapp.service /etc/systemd/system/webapp.service
