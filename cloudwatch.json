@@ -1,7 +1,3 @@
-#!/bin/bash
-
-# Define the JSON configuration as a heredoc
-json_config=$(cat <<EOF
 {
   "agent": {
     "metrics_collection_interval": 10,
@@ -31,11 +27,3 @@ json_config=$(cat <<EOF
     }
   }
 }
-EOF
-)
-
-# Use the configuration in the JSON variable as needed
-echo "JSON Configuration:"
-echo "$json_config"
-
-# Other commands to set up CloudWatch Agent
