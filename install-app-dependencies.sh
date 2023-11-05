@@ -2,6 +2,7 @@
 
 sudo groupadd csye6225group
 sudo useradd -s /bin/false -g csye6225group -d /opt -m csye6225user
+sudo chown csye6225user:csye6225group -r /opt/webapp
 sudo mv /tmp/webapp.zip /opt/webapp.zip
 cd /opt || exit
 
