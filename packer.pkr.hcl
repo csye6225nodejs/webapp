@@ -66,7 +66,7 @@ build {
 
   provisioner "file" {
     source      = "cloudwatch.json"
-    destination = "/opt/aws/amazon-cloudwatch-agent/bin/cloudwatch-config.json" 
+    destination = "/opt/aws/amazon-cloudwatch-agent/bin/cloudwatch-config.json"
   }
 
   provisioner "shell" {
