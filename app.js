@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const winston = require("winston");
+
 const fs = require("fs");
 const app = express();
 
@@ -23,15 +23,4 @@ app.use('*',(req,res) => {
 })
 
 
-//set logger
-const logger = winston.createLogger({
-    level: 'info', // Adjust the log level as needed
-    format: winston.format.simple(),
-    transports: [
-      new winston.transports.Console(),
-      new winston.transports.File({ filename: '/logs/csye6225.log' }), // Log to a file
-    ],
-  });
-  
-
-module.exports = {app, logger};
+module.exports = app;
