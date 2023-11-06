@@ -26,7 +26,7 @@ async function healthcontroller(req, res) {
     } else if (result === true) {
         LoadFromCSV();
         logger.info("Succesfully connected to the database");
-        statsdClient.increment('requests.processed');
+        //statsdClient.increment('requests.processed');
         res.status(200).send();
     }
 }
