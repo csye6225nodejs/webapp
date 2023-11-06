@@ -1,6 +1,7 @@
 // Import necessary modules and database configuration
 const sequelize = require('./../config/dbconfig');
 const Account = require('./../models/Account');
+const logger = require('./../logger/logger');
 
 // Function to start the database connection
 async function startDb() {
@@ -8,14 +9,14 @@ async function startDb() {
     try{
         
         await sequelize.authenticate();
-        console.log("connected to the db");
-        
+        console.log("connected to the database");
+        logger.info("connecting to database");
         await sequelize.sync();
-        console.log("error in connecting to database");
-         return true;
+        return true;
      } catch(error)
      {
-        console.error("error ", error.message);
+        console.log("error in connecting to the database");
+        logger.error("Error in connecting to the database");
         return false;
      }
 }

@@ -2,12 +2,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const Account = require('./../models/Account');
 const bcrypt = require('bcrypt');
+const logger = require('./../logger/logger');
 
 
 async function basicAuth(req,res,next) {
     const authHeader = req.headers['authorization'];
 
     if(!authHeader){
+        logger.info("Your operation is not permitted");
         res.status(401).send();
         return;
     }
@@ -24,7 +26,7 @@ async function basicAuth(req,res,next) {
         req.userId = await getUserId(username);
         next();
     } else {
-        console.log("Im here");
+        logger.info("This is not a valid or authenticated user");
         res.status(401).send();
     }
 }
@@ -41,12 +43,15 @@ async function isValidUser(email, password) {
 
         if(isMatch){
             console.log("it matches");
+            logger.info("You are a valid user");
             return true;
         } else {
+            logger.info("You are not a valid user");
             console.log("Does not match");
             return false;
         }
     } catch(error) {
+        logger.error("You have an authentication error in middleware");
         console.error('Authentication error: ', error);
         return false;
     }
