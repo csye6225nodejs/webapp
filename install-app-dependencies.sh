@@ -36,8 +36,11 @@ sudo apt-get remove git -y
 sudo apt-get clean
 
 
-
+sudo chown csye6225user:csye6225group -R /opt/webapp
 sudo mv /tmp/webapp.service /etc/systemd/system/webapp.service
+
+wget https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb
+sudo dpkg -i amazon-cloudwatch-agent.deb
 
 
 # Start MariaDB service
