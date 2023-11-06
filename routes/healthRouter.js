@@ -9,45 +9,47 @@ const { healthcontroller } = require('../controllers/healthcontroller');
 router.get('/', healthcontroller);
 
 router.get('*', (req, res) => {
-  logger.info("unknown api get request gives 404 error");
+  logger.info("unknown api get request does not exist");
   res.status(404).send();
 });
 
 router.put('/', (req, res) => {
-    console.log("Hi");
-    logger.info("/ path put request gives 405 error");
+    logger.info("/ path put request is not allowed");
     res.status(405).send();
   });
 
 router.post('/',(req,res) => {
-  console.log("Hi");
-  logger.info("hi");
+  logger.info("/ path post request is not allowed");
   res.status(405).send();
 });
+
 router.post('*', (req,res) => {
-  console.log("Hi");
-  logger.info("unknown post request gives 404 error");
+  logger.info("unknown path post request does not exist");
   res.status(404).send();
 });
+
 router.put('*',(req,res) => {
-  console.log("Hi");
-  logger.info("unknown put request gives 404 error");
+  logger.info("unknown path put request does not exist");
   res.status(404).send();
 });
+
 router.delete('/', (req, res) => {
-    logger.info("/ delete request gives 405 error");
+    logger.info("/ path delete request is not allowed");
     res.status(405).send();
 });
+
 router.delete('*',(req,res) => {
-  logger.info("unknown delete request gives 405 error");
+  logger.info("unknown path delete request does not exist");
   res.status(404).send();
 });
+
 router.patch('/', (req, res) => {
-  logger.info("/ patch request gives 405 error");
+  logger.info("/ path patch request is not allowed");
   res.status(405).send();
 });
+
 router.patch('*',(req,res) => {
-  logger.info("unknown patch request gives 405 error");
+  logger.info("unknown patch request is not allowed");
   res.status(405).send();
 });
 

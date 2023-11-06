@@ -22,6 +22,7 @@ function LoadFromCSV() {
                                 // Hash the password using bcrypt
                                 bcrypt.hash(row.password, 10, (err, hashedPassword) => {
                                   if (err) {
+                                    logger.error('Failed to hash the password', err);
                                     console.error('Failed to hash the password:', err);
                                   } else {
                                     // Create the user with the hashed password

@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-
+const logger = require('./logger/logger');
 const fs = require("fs");
 const app = express();
 
@@ -19,6 +19,7 @@ const assignmentRouter = require('./routes/assignmentRouter');
 app.use('/healthz', healthzRoute);
 app.use('/v1/assignments', assignmentRouter);
 app.use('*',(req,res) => {
+    logger.info("this is not an acceptable path to hit");
     res.status(404).send();
 })
 
