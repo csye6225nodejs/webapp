@@ -25,8 +25,7 @@ sudo nvm use 20.7.0
     
 # Update package lists
 sudo apt update
-# Install MariaDB and npm
-sudo apt install -y mariadb-server
+# Install npm
 sudo apt install -y npm
 
 sudo npm install
@@ -39,9 +38,6 @@ sudo apt-get clean
 sudo chown csye6225user:csye6225group -R /opt/webapp
 sudo mv /tmp/webapp.service /etc/systemd/system/webapp.service
 
-wget https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb
+sudo wget https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb
 sudo dpkg -i amazon-cloudwatch-agent.deb
-
-
-# Start MariaDB service
 
