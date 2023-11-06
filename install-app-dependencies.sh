@@ -40,4 +40,5 @@ sudo mv /tmp/webapp.service /etc/systemd/system/webapp.service
 
 sudo wget https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb
 sudo dpkg -i amazon-cloudwatch-agent.deb
+sudo node-statsd /config/statsd-config.js
 

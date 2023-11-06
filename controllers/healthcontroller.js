@@ -4,6 +4,7 @@ const { LoadFromCSV } = require('./../services/csvLoader');
 const app = require('./../app');
 const logger = require('./../logger/logger');
 const url = require('url');
+const statsdClient = require('./statsdConfig');
 //Import Load User from CSV
 
 // Define a controller for the health check route
@@ -23,9 +24,9 @@ async function healthcontroller(req, res) {
         logger.info("error in connecting to the database");
         res.status(503).send();
     } else if (result === true) {
-        console.log(app);
-        logger.info("Succesfully connected to the database");
         LoadFromCSV();
+        logger.info("Succesfully connected to the database");
+        statsdClient.increment('requests.processed');
         res.status(200).send();
     }
 }
