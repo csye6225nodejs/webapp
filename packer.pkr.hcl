@@ -65,19 +65,6 @@ build {
   }
 
   provisioner "shell" {
-    inline = [
-      "wget https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm",
-      "sudo rpm -U ./amazon-cloudwatch-agent.rpm",
-      "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/cloudwatch-config.json -s"
-    ]
-  }
-
-  provisioner "file" {
-    source      = "./cloudwatch-config.json"
-    destination = "/opt/aws/amazon-cloudwatch-agent/bin/cloudwatch-config.json"
-  }
-
-  provisioner "shell" {
 
     environment_vars = [
       "DEBIAN_FRONTEND=noninteractive",
