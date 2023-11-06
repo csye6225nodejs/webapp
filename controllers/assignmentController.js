@@ -5,7 +5,7 @@ const assignment  = require('./../models/Assignment');
 const account = require('./../models/Account');
 const sequelize = require('./../config/dbconfig');
 const logger = require('./../logger/logger');
-const statsdClient = require('./statsdConfig');
+const statsdClient = require('./../config/statsd-config');
 const authMiddleware = require('./../middleware/authMiddleware');
 
 async function getAllAccounts(req,res) {
