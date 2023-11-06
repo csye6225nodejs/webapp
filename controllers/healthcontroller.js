@@ -4,7 +4,7 @@ const { LoadFromCSV } = require('./../services/csvLoader');
 const app = require('./../app');
 const logger = require('./../logger/logger');
 const url = require('url');
-const statsdClient = require('./statsdConfig');
+const statsdClient = require('./../config/statsd-config');
 //Import Load User from CSV
 
 // Define a controller for the health check route
