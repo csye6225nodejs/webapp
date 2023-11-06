@@ -4,6 +4,7 @@ const { LoadFromCSV } = require('../services/csvLoader');
 const assignment  = require('./../models/Assignment');
 const account = require('./../models/Account');
 const sequelize = require('./../config/dbconfig');
+const logger = require('./../logger/logger');
 const authMiddleware = require('./../middleware/authMiddleware');
 
 async function getAllAccounts(req,res) {
@@ -11,10 +12,11 @@ async function getAllAccounts(req,res) {
 
         await sequelize.sync();
         const result = await account.findAll();
+        logger.info("Get all users ")
         res.status(200).json(result);   
 
    } catch(error)  {
-       console.error('Failed to get all accounts : ', error);
+       logger.error('Failed to get all accounts : ', error);
    }; 
 }
 

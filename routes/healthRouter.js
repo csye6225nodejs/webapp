@@ -1,7 +1,8 @@
 const express = require('express');
 const fs = require("fs");
-const {app, logger} = require('./../app');
+const app = require('./../app.js');
 const router = express.Router();
+const logger = require('./../logger/logger.js');
 const { healthcontroller } = require('../controllers/healthcontroller');
 
 // Health check route definition
@@ -13,19 +14,23 @@ router.get('*', (req, res) => {
 });
 
 router.put('/', (req, res) => {
+    console.log("Hi");
     logger.info("/ path put request gives 405 error");
     res.status(405).send();
   });
 
 router.post('/',(req,res) => {
-  logger.info("/ path post request gives 405 error");
+  console.log("Hi");
+  logger.info("hi");
   res.status(405).send();
 });
 router.post('*', (req,res) => {
+  console.log("Hi");
   logger.info("unknown post request gives 404 error");
   res.status(404).send();
 });
 router.put('*',(req,res) => {
+  console.log("Hi");
   logger.info("unknown put request gives 404 error");
   res.status(404).send();
 });

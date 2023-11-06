@@ -1,7 +1,8 @@
 // Import necessary modules and services
 const { startDb } = require('../services/dbService');
 const { LoadFromCSV } = require('./../services/csvLoader');
-const {app, logger} = require('./../app');
+const app = require('./../app');
+const logger = require('./../logger/logger');
 const url = require('url');
 //Import Load User from CSV
 
@@ -19,10 +20,11 @@ async function healthcontroller(req, res) {
     }
     const result = await startDb();
     if (result === false) {
-        logger.info("/healthz cannot connect to database, its an error ");
+        logger.info("error in connecting to the database");
         res.status(503).send();
     } else if (result === true) {
-        logger.info("/healthz connected to database, all good");
+        console.log(app);
+        logger.info("Succesfully connected to the database");
         LoadFromCSV();
         res.status(200).send();
     }
