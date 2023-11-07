@@ -1,8 +1,5 @@
 const StatsD = require('node-statsd');
 
-const statsdClient = new StatsD({
-  host: 'localhost',  
-  port: 8125,        
-});
+const statsdClient = new StatsD();
 
 module.exports = statsdClient;
