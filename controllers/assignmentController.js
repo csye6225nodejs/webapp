@@ -40,7 +40,6 @@ async function getAssignment(req,res) {
               res.status(404).send();
             } else {
               logger.info("here is the assignment you wanted");
-              statsdClient.increment('requests.processed');
               res.status(200).send(result);
             }
           } catch (error) {
@@ -66,7 +65,6 @@ async function getAllAssignments(req,res) {
         await sequelize.sync();
         const result = await assignment.findAll();
         logger.info("All Assignments getting printed");
-        statsdClient.increment('requests.processed');
         res.status(200).json(result);   
    } catch(error)  {
        logger.error("Failed to get all assignments");
@@ -123,7 +121,6 @@ async function addAssignment(req, res) {
 
         logger.info("Assignment added to your list");
         console.log('New Assignment:', newAssignment);
-        statsdClient.increment('requests.processed');
         res.status(201).send(newAssignment);
     } catch (error) {
         console.log('Failed to add an assignment: ' + error);
@@ -214,7 +211,6 @@ async function updateAssignment(req, res) {
 
         await existingAssignment.save(); // Save the changes to the database
         logger.info("Changing assignment and updating it");
-        statsdClient.increment('requests.processed');
         res.status(204).send(existingAssignment);
     } catch (error) {
         console.error('Failed to update an assignment: ' + error);
@@ -250,7 +246,6 @@ async function deleteAssignment(req, res) {
         // Perform the delete operation
         await assign.destroy();
         logger.info("Deleting the assignment")
-        statsdClient.increment('requests.processed');
         res.status(204).send(); // Respond with a success status and no content
     } catch (error) {
         logger.error("Error in deleting assignment");
