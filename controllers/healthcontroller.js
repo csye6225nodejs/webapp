@@ -10,11 +10,11 @@ const statsdClient = require('./../config/statsd-config');
 // Define a controller for the health check route
 async function healthcontroller(req, res) {
     res.setHeader('Cache-Control','no-cache'); 
-    if(process.env.NODE_ENV !== 'workflow')
+    /*if(process.env.NODE_ENV !== 'workflow')
     {
         statsdClient.increment('/healthz_get_api_called');
         logger.info("/healthz api works well");
-    }
+    }*/
     if (req.body && Object.keys(req.body).length >0){
         //logger.info("/healthz Get request has body, its an error ");
         res.status(400).send();
