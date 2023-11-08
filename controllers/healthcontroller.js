@@ -11,23 +11,24 @@ const statsdClient = require('./../config/statsd-config');
 async function healthcontroller(req, res) {
     res.setHeader('Cache-Control','no-cache'); 
     statsdClient.increment('/healthz_get_api_called');
+    logger.info("/healthz api works well");
     if (req.body && Object.keys(req.body).length >0){
-        logger.info("/healthz Get request has body, its an error ");
+        //logger.info("/healthz Get request has body, its an error ");
         res.status(400).send();
     }
     const queryParams = req.query;
     if (Object.keys(queryParams).length > 0) {
-        logger.info("/healthz Get request has query parameters, its an error ");
+        //logger.info("/healthz Get request has query parameters, its an error ");
         res.status(400).send();
     }
     const result = await startDb();
     if (result === false) {
-        logger.info("error in connecting to the database");
+        //logger.info("error in connecting to the database");
         //
         res.status(503).send();
     } else if (result === true) {
         LoadFromCSV();
-        logger.info("Succesfully connected to the database");
+        //logger.info("Succesfully connected to the database");
         //statsdClient.increment('requests.processed');
         res.status(200).send();
     }
