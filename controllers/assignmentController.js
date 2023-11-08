@@ -10,11 +10,11 @@ const authMiddleware = require('./../middleware/authMiddleware');
 
 async function getAllAccounts(req,res) {
 
+    statsdClient.increment('/v1/assignments_called');
     try{
         await sequelize.sync();
         const result = await account.findAll();
-        logger.info("Get all users ")
-        statsdClient.increment('requests.processed');
+        logger.info("Get all accounts");
         res.status(200).json(result);   
 
    } catch(error)  {
@@ -23,7 +23,9 @@ async function getAllAccounts(req,res) {
 }
 
 async function getAssignment(req,res) {
+
         const assignmentId = req.params.uuid;
+        statsdClient.increment('v1/assignments/{id}_get_called');
         await sequelize.sync();
         try {
             const result = await assignment.findOne({
@@ -48,6 +50,8 @@ async function getAssignment(req,res) {
 }
 
 async function getAllAssignments(req,res) {
+
+    statsdClient.increment('v1/assignments_get_called');
     try{
 
         if (req.body && Object.keys(req.body).length >0){
@@ -71,6 +75,7 @@ async function getAllAssignments(req,res) {
 }
 
 async function addAssignment(req, res) {
+    statsdClient.increment('v1/assignments_post_called');
     try {
         const { name, points, num_of_attempts, deadline} = req.body;
         const userId = req.userId;
@@ -128,6 +133,7 @@ async function addAssignment(req, res) {
 }
 
 async function updateAssignment(req, res) {
+    statsdClient.increment('v1/assignments_put_called');
     try {
         const assignmentId = req.params.id; // Assuming you pass the assignment ID as a route parameter
         const userId = req.userId;
@@ -217,6 +223,7 @@ async function updateAssignment(req, res) {
 }
 
 async function deleteAssignment(req, res) {
+    statsdClient.increment('v1/assignments_delete_called');
     try {
         const assignmentId = req.params.id; // Capture the assignment ID from the URL
         const userId = req.userId; // Assuming you have a way to get the authenticated user's ID
