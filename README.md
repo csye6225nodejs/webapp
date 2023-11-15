@@ -40,6 +40,7 @@ sudo systemctl enable mariadb
 # Start MySQL Server
 service mysql start
 
+Change README.md
 # Define the SQL command
 SQL_COMMAND="GRANT ALL PRIVILEGES ON *.* TO '127.0.0.1'@'%' IDENTIFIED BY 'Abhi3534';"
 
