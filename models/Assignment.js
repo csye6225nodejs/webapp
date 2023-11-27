@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('./../config/dbconfig');
 const { v4: uuidv4 } = require('uuid');
+const Submission = require('./Submission');
 
 const Assignment = sequelize.define('assignment',{
     uuid: {
@@ -43,5 +44,7 @@ const Assignment = sequelize.define('assignment',{
         createdAt: 'assignment_created', // Rename the createdAt field
         updatedAt: 'assignment_updated' // Rename the updatedAt field
 });
+
+Assignment.hasMany(Submission, { foreignKey: 'assignment_id' });
 
 module.exports = Assignment;

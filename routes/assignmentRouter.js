@@ -8,6 +8,7 @@ const logger = require('./../logger/logger');
 
 router.get('/', authMiddleware.basicAuth , assignmentController.getAllAssignments);
 router.get('/:id', authMiddleware.basicAuth, assignmentController.getAssignment);
+router.post('/:id/submission', authMiddleware.basicAuth, assignmentController.addSubmission);
 router.get("*",(req,res) => {
     logger.info("unknown get request path does not exist");
     res.status(404).send();
