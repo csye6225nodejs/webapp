@@ -18,6 +18,7 @@ const assignmentRouter = require('./routes/assignmentRouter');
 // Use route definitions
 app.use('/healthz', healthzRoute);
 app.use('/v1/assignments', assignmentRouter);
+
 app.use('*',(req,res) => {
     logger.info("this is not an acceptable path to hit");
     res.status(404).send();

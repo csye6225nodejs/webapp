@@ -2,6 +2,7 @@
 const { startDb } = require('../services/dbService');
 const { LoadFromCSV } = require('../services/csvLoader');
 const assignment  = require('./../models/Assignment');
+const submission = require('./../models/Submission');
 const account = require('./../models/Account');
 const sequelize = require('./../config/dbconfig');
 const logger = require('./../logger/logger');
@@ -254,7 +255,47 @@ async function deleteAssignment(req, res) {
     }
 }
 
+async function addSubmission(req, res){
+    statsdClient.increment('v1/assignments/:id/submission_post_called');
+    try {
 
+        const assignment_id = req.params.id;
+        const userId = req.userId;
+        const { submission_url } = req.body;
 
+        const result = await assignment.findOne({
+              where: {
+                uuid: assignment_id, 
+              },
+        });
+        
+        const submission_date = new Date(); 
+        
+        if (!submission_url ) {
+            logger.info("One of the required query values are missing, bad request");
+            return res.status(400).send(); 
+        };
 
-module.exports = { getAllAccounts, getAllAssignments, addAssignment, updateAssignment, deleteAssignment, getAssignment };
+        
+        
+        await sequelize.sync();
+
+        //console.log(req.userId+"USer");
+        const newSubmission = await submission.create({
+            assignment_id,
+            submission_url,
+            submission_date,
+        });
+
+        logger.info("Submission added to your assignment");
+        console.log('New Submission:', newSubmission);
+        res.status(201).send(newSubmission);
+    }
+    catch(error){
+        logger.error("Error in deleting assignment");
+        console.error('Failed to delete the assignment:', error);
+        res.status(400).send();
+    }
+}
+
+module.exports = { getAllAccounts, getAllAssignments, addAssignment, updateAssignment, deleteAssignment, getAssignment, addSubmission };
