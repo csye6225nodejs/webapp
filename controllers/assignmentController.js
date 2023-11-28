@@ -1,5 +1,7 @@
 // Import necessary modules and services
 const AWS = require('aws-sdk');
+const axios = require('axios');
+const url = require('url');
 const { startDb } = require('../services/dbService');
 const { LoadFromCSV } = require('../services/csvLoader');
 const assignment  = require('./../models/Assignment');
@@ -272,7 +274,7 @@ async function addSubmission(req, res){
         });
         
        //getting email from assignment to account
-       const noOfSubmissions = 2;
+       const noOfSubmissions = getSubmissionCountByAssignmentId(result.dataValues.assignment_id);
        const user_id = result.dataValues.userId;
        const account_row = await account.findOne({ where: { id: user_id } });
        const email_id = account_row.dataValues.email;
@@ -332,5 +334,42 @@ async function addSubmission(req, res){
         res.status(400).send();
     }
 }
+
+async function getSubmissionCountByAssignmentId(assignmentId) {
+    try {
+      const submissionCount = await submission.count({
+        where: {
+          assignment_id: assignmentId,
+        },
+      });
+  
+      logger.info(`Number of submissions for assignment ${assignmentId}: ${submissionCount}`);
+      return submissionCount;
+    } catch (error) {
+      logger.error('Error retrieving submission count:', error);
+      throw error;
+    }
+  }
+
+  async function validateZipFile(urlToValidate) {
+    try {
+        const parsedUrl = new URL(urlToValidate);
+        const response = await axios.head(parsedUrl.href);
+
+        // Check if the response indicates a zip file
+        const contentType = response.headers['content-type'];
+        if (contentType && contentType.toLowerCase().includes('zip')) {
+            logger.log('Valid URL for a .zip file');
+            return true;
+        } else {
+            logger.error('Invalid URL: Not a .zip file');
+            return false;
+        }
+    } catch (error) {
+        logger.error('Error validating URL:', error.message);
+        return false;
+    }
+  }
+
 
 module.exports = { getAllAccounts, getAllAssignments, addAssignment, updateAssignment, deleteAssignment, getAssignment, addSubmission };
