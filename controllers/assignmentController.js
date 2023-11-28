@@ -288,18 +288,32 @@ async function addSubmission(req, res){
        const submission_date = new Date(); 
         
        if (!submission_url ) {
-            logger.info("One of the required query values are missing, bad request");
-            return res.status(400).send(); 
+            logger.info("Submission URL values are missing, bad request");
+            return res.status(400).send("Add Submission URL"); 
         };
 
-        //console.log(req.userId+"USer");
+        if (/^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/.test(url)) {
+            return res.status(404).json({ message: 'Invalid URL format' });
+        } 
+
+        try {
+            const response = await axios.head(submission_url);
+            // Process the response
+        } catch (error) {
+            return res.status(400).send("URL does not return a response");
+            // Handle the error, e.g., return a 500 Internal Server Error response
+        }
+       
+
+        if (contentType === 'application/zip') {
+        // If it's a ZIP file, create a new submission and save it to the database
         const newSubmission = await submission.create({
             assignment_id,
             submission_url
         });
 
         await sequelize.sync();
-        
+
         // Set the AWS region
         AWS.config.update({
             region: 'us-east-2', // Replace with your AWS region, e.g., 'us-east-1'
@@ -326,7 +340,12 @@ async function addSubmission(req, res){
 
         logger.info("Submission added to your assignment");
         console.log('New Submission:', newSubmission);
-        res.status(201).send(newSubmission);
+        return res.status(201).send(newSubmission);
+
+    }   else {
+            return res.status(404).json({ message: 'URL does not point to a ZIP file' });
+        }
+        //console.log(req.userId+"USer");
     }
     catch(error){
         logger.error("Error in adding submission");
@@ -335,8 +354,15 @@ async function addSubmission(req, res){
     }
 }
 
+
 async function getSubmissionCountByAssignmentId(assignmentId) {
     try {
+      
+      if (assignmentId === undefined || assignmentId === null) {
+        // Handle the case where assignmentId is undefined or null
+        logger.warn('Assignment ID is undefined or null. Returning 0.');
+        return 0;
+      }
       const submissionCount = await submission.count({
         where: {
           assignment_id: assignmentId,
@@ -346,30 +372,42 @@ async function getSubmissionCountByAssignmentId(assignmentId) {
       logger.info(`Number of submissions for assignment ${assignmentId}: ${submissionCount}`);
       return submissionCount;
     } catch (error) {
+        if (error.name === 'SequelizeDatabaseError' && error.parent && error.parent.code === 'ER_NO_SUCH_TABLE') {
+            // Handle the case where the table doesn't exist
+            logger.warn(`The table does not exist. Returning 0 for assignment ${assignmentId}`);
+            return 0;
+          } else {
+            // Rethrow the error for other unexpected errors
+            logger.error('Error retrieving submission count:', error);
+            throw error;
+          }
       logger.error('Error retrieving submission count:', error);
       throw error;
     }
-  }
+}
 
-  async function validateZipFile(urlToValidate) {
+async function validateZipFile(urlToValidate) {
     try {
         const parsedUrl = new URL(urlToValidate);
         const response = await axios.head(parsedUrl.href);
 
         // Check if the response indicates a zip file
         const contentType = response.headers['content-type'];
-        if (contentType && contentType.toLowerCase().includes('zip')) {
-            logger.log('Valid URL for a .zip file');
+        console.log("Content type"+contentType);
+
+        if (contentType!=null) {
+            logger.info('Valid URL for a .zip file');
+            console.log("hello");
             return true;
         } else {
-            logger.error('Invalid URL: Not a .zip file');
+            logger.info('Invalid URL: Not a .zip file');
             return false;
         }
     } catch (error) {
         logger.error('Error validating URL:', error.message);
         return false;
     }
-  }
+}
 
 
 module.exports = { getAllAccounts, getAllAssignments, addAssignment, updateAssignment, deleteAssignment, getAssignment, addSubmission };
