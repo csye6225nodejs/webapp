@@ -1,5 +1,5 @@
 // Import necessary modules and services
-const aws = require('aws-sdk');
+const AWS = require('aws-sdk');
 const { startDb } = require('../services/dbService');
 const { LoadFromCSV } = require('../services/csvLoader');
 const assignment  = require('./../models/Assignment');
@@ -260,6 +260,7 @@ async function addSubmission(req, res){
 
     statsdClient.increment('v1/assignments/:id/submission_post_called');
     try {
+
         const assignment_id = req.params.id;
         const userId = req.userId;
         const { submission_url } = req.body;
@@ -275,10 +276,16 @@ async function addSubmission(req, res){
        const user_id = result.dataValues.userId;
        const account_row = await account.findOne({ where: { id: user_id } });
        const email_id = account_row.dataValues.email;
+       
+       const message = {
+        submissionDetails: submission,
+        userId: email_id,
+        noOfSubmissions: noOfSubmissions
+       };
 
        const submission_date = new Date(); 
         
-        if (!submission_url ) {
+       if (!submission_url ) {
             logger.info("One of the required query values are missing, bad request");
             return res.status(400).send(); 
         };
@@ -290,31 +297,30 @@ async function addSubmission(req, res){
         });
 
         await sequelize.sync();
-        const snsClient = new aws.SNS({
-            region: 'us-east-2'
+        
+        // Set the AWS region
+        AWS.config.update({
+            region: 'us-east-2', // Replace with your AWS region, e.g., 'us-east-1'
         });
 
-        const message = {
-            submissionDetails: submission,
-            userId: email_id,
-            noOfSubmissions: noOfSubmissions
-        };
+        const sns = new AWS.SNS();
 
-        const topicArn = process.env.SNS;
-        const params = {
-            Message: JSON.stringify(message),
-            TopicArn: topicArn,
-        };
-        try{
-            const publishData = await snsClient.publish(params).promise();
-            console.log(message);
-            console.log(publishData);
-            logger.info(`Message published successfully: ${publishData.MessageId}`);
-            logger.info(message);
-        } catch (error) {
-        
-            logger.info("SNS error"+error);
-        };
+        sns.publish({
+            Message: message,
+            TopicArn: process.env.SNS,
+        }, (err, data) => {
+        if (err) {
+            console.error('Error publishing message to SNS:', err);
+            logger.error('Error publishing message to SNS', err);
+            // Uncomment and customize the following line if used in an HTTP request handler
+            // res.status(500).send('Internal Server Error');
+        } else {
+            console.log('Message published to SNS:', data);
+            logger.info('Message published to SNS', data);
+            // Uncomment and customize the following line if used in an HTTP request handler
+            // res.status(200).send('Message sent successfully');
+        }
+        });
 
         logger.info("Submission added to your assignment");
         console.log('New Submission:', newSubmission);
