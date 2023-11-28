@@ -306,7 +306,7 @@ async function addSubmission(req, res){
         const sns = new AWS.SNS();
 
         sns.publish({
-            Message: message,
+            Message: JSON.stringify(message),
             TopicArn: process.env.SNS,
         }, (err, data) => {
         if (err) {
