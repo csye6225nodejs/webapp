@@ -289,16 +289,18 @@ async function addSubmission(req, res){
         });
         await sequelize.sync();
         const message = submission_url+" "+email_id;
-        console.log(message);
+        logger.info(message);
         sns.publish({
             Message: message,
             TopicArn: process.env.SNS,
           }, (err, data) => {
             if (err) {
+              logger.error('Error publishing message to sns',err);
               console.error('Error publishing message to SNS:', err);
               //res.status(400).send('Internal Server Error');
             } else {
               console.log('Message published to SNS:', data);
+              logger.info('Message published publishing to sns',data);
               //res.status(200).send('Message sent successfully');
             }
         });
