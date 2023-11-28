@@ -282,35 +282,33 @@ async function addSubmission(req, res){
             return res.status(400).send(); 
         };
 
-        await sequelize.sync();
-
         //console.log(req.userId+"USer");
         const newSubmission = await submission.create({
             assignment_id,
-            submission_url,
-            submission_date,
+            submission_url
         });
-
+        await sequelize.sync();
         const message = submission_url+" "+email_id;
+        console.log(message);
         sns.publish({
             Message: message,
-            TopicArn: snsTopicArn,
+            TopicArn: process.env.SNS,
           }, (err, data) => {
             if (err) {
               console.error('Error publishing message to SNS:', err);
-              res.status(500).send('Internal Server Error');
+              //res.status(400).send('Internal Server Error');
             } else {
               console.log('Message published to SNS:', data);
-              res.status(200).send('Message sent successfully');
+              //res.status(200).send('Message sent successfully');
             }
-          });
+        });
 
         logger.info("Submission added to your assignment");
         console.log('New Submission:', newSubmission);
         res.status(201).send(newSubmission);
     }
     catch(error){
-        logger.error("Error in deleting assignment");
+        logger.error("Error in adding submission");
         console.error('Failed to delete the assignment:', error);
         res.status(400).send();
     }
