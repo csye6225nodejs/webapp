@@ -1,4 +1,5 @@
 // Import necessary modules and services
+const aws = require('aws-sdk');
 const { startDb } = require('../services/dbService');
 const { LoadFromCSV } = require('../services/csvLoader');
 const assignment  = require('./../models/Assignment');
@@ -258,7 +259,7 @@ async function deleteAssignment(req, res) {
 async function addSubmission(req, res){
     statsdClient.increment('v1/assignments/:id/submission_post_called');
     try {
-
+        const sns = new aws.SNS();
         const assignment_id = req.params.id;
         const userId = req.userId;
         const { submission_url } = req.body;
@@ -269,15 +270,18 @@ async function addSubmission(req, res){
               },
         });
         
-        const submission_date = new Date(); 
+       //getting email from assignment to account
+       const user_id = result.dataValues.userId;
+       const account_row = await account.findOne({ where: { id: user_id } });
+       const email_id = account_row.dataValues.email;
+
+       const submission_date = new Date(); 
         
         if (!submission_url ) {
             logger.info("One of the required query values are missing, bad request");
             return res.status(400).send(); 
         };
 
-        
-        
         await sequelize.sync();
 
         //console.log(req.userId+"USer");
@@ -286,6 +290,20 @@ async function addSubmission(req, res){
             submission_url,
             submission_date,
         });
+
+        const message = submission_url+" "+email_id;
+        sns.publish({
+            Message: message,
+            TopicArn: snsTopicArn,
+          }, (err, data) => {
+            if (err) {
+              console.error('Error publishing message to SNS:', err);
+              res.status(500).send('Internal Server Error');
+            } else {
+              console.log('Message published to SNS:', data);
+              res.status(200).send('Message sent successfully');
+            }
+          });
 
         logger.info("Submission added to your assignment");
         console.log('New Submission:', newSubmission);
