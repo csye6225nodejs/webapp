@@ -300,7 +300,7 @@ async function addSubmission(req, res){
             noOfSubmissions: noOfSubmissions
         };
 
-        const topicArn = process.env.SNS
+        const topicArn = process.env.SNS;
         const params = {
             Message: JSON.stringify(message),
             TopicArn: topicArn,
