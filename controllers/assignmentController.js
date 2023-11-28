@@ -257,9 +257,9 @@ async function deleteAssignment(req, res) {
 }
 
 async function addSubmission(req, res){
+
     statsdClient.increment('v1/assignments/:id/submission_post_called');
     try {
-        const sns = new aws.SNS();
         const assignment_id = req.params.id;
         const userId = req.userId;
         const { submission_url } = req.body;
@@ -271,6 +271,7 @@ async function addSubmission(req, res){
         });
         
        //getting email from assignment to account
+       const noOfSubmissions = 2;
        const user_id = result.dataValues.userId;
        const account_row = await account.findOne({ where: { id: user_id } });
        const email_id = account_row.dataValues.email;
@@ -287,23 +288,33 @@ async function addSubmission(req, res){
             assignment_id,
             submission_url
         });
+
         await sequelize.sync();
-        const message = submission_url+" "+email_id;
-        logger.info(message);
-        sns.publish({
-            Message: message,
-            TopicArn: process.env.SNS,
-          }, (err, data) => {
-            if (err) {
-              logger.error('Error publishing message to sns',err);
-              console.error('Error publishing message to SNS:', err);
-              //res.status(400).send('Internal Server Error');
-            } else {
-              console.log('Message published to SNS:', data);
-              logger.info('Message published publishing to sns',data);
-              //res.status(200).send('Message sent successfully');
-            }
+        const snsClient = new aws.SNS({
+            region: 'us-east-2'
         });
+
+        const message = {
+            submissionDetails: submission,
+            userId: email_id,
+            noOfSubmissions: noOfSubmissions
+        };
+
+        const topicArn = process.env.SNS
+        const params = {
+            Message: JSON.stringify(message),
+            TopicArn: topicArn,
+        };
+        try{
+            const publishData = await snsClient.publish(params).promise();
+            console.log(message);
+            console.log(publishData);
+            logger.info(`Message published successfully: ${publishData.MessageId}`);
+            logger.info(message);
+        } catch (error) {
+        
+            logger.info("SNS error"+error);
+        };
 
         logger.info("Submission added to your assignment");
         console.log('New Submission:', newSubmission);
