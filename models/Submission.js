@@ -18,15 +18,12 @@ const Submission = sequelize.define('submission',{
     submission_url: {
         type: DataTypes.STRING,
         allowNull: false,
-    },
-    assignment_updated: {
-        type: DataTypes.DATE,
-        allowNull: false
     }
 },{
     timestamps: true,
-    createdAt: 'submission_date', //set to false to disable automatic timestamps
-    updatedAt: 'assignment_updated' //Rename UpdatedAt field
-});
+    createdAt: "submission_date", //update CreatedAt field
+    updatedAt: "submission_updated" //Rename UpdatedAt field
+ } 
+);
 
 module.exports = Submission;
