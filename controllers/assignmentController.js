@@ -279,11 +279,7 @@ async function addSubmission(req, res){
        const account_row = await account.findOne({ where: { id: user_id } });
        const email_id = account_row.dataValues.email;
        
-       const message = {
-        submissionDetails: submission,
-        userId: email_id,
-        noOfSubmissions: noOfSubmissions
-       };
+
 
        const submission_date = new Date(); 
         
@@ -292,26 +288,27 @@ async function addSubmission(req, res){
             return res.status(400).send("Add Submission URL"); 
         };
 
-        if (/^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/.test(url)) {
-            return res.status(404).json({ message: 'Invalid URL format' });
-        } 
-
-        try {
-            const response = await axios.head(submission_url);
-            // Process the response
-        } catch (error) {
+        /*if (/^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/.test(submission_url)) {
+            return res.status(400).json({ message: 'Invalid URL format' });
+        } */  
+        const response= await axios.head(submission_url);
+        if(response === null){
             return res.status(400).send("URL does not return a response");
-            // Handle the error, e.g., return a 500 Internal Server Error response
         }
        
-
-        if (contentType === 'application/zip') {
+        const contentType = response.headers['content-type'];
+        if (contentType.includes('zip')) {
         // If it's a ZIP file, create a new submission and save it to the database
         const newSubmission = await submission.create({
             assignment_id,
             submission_url
         });
 
+        const message = {
+            submissionDetails: newSubmission,
+            emailId: email_id,
+            noOfSubmissions: noOfSubmissions
+           };
         await sequelize.sync();
 
         // Set the AWS region
@@ -321,6 +318,9 @@ async function addSubmission(req, res){
 
         const sns = new AWS.SNS();
 
+        const str = JSON.stringify(message);
+        const retreive1 = JSON.parse(str);
+        console.log(retreive1.submissionDetails.submission_url);
         sns.publish({
             Message: JSON.stringify(message),
             TopicArn: process.env.SNS,
@@ -339,7 +339,7 @@ async function addSubmission(req, res){
         });
 
         logger.info("Submission added to your assignment");
-        console.log('New Submission:', newSubmission);
+        //console.log('New Submission:', newSubmission);
         return res.status(201).send(newSubmission);
 
     }   else {
@@ -383,29 +383,6 @@ async function getSubmissionCountByAssignmentId(assignmentId) {
           }
       logger.error('Error retrieving submission count:', error);
       throw error;
-    }
-}
-
-async function validateZipFile(urlToValidate) {
-    try {
-        const parsedUrl = new URL(urlToValidate);
-        const response = await axios.head(parsedUrl.href);
-
-        // Check if the response indicates a zip file
-        const contentType = response.headers['content-type'];
-        console.log("Content type"+contentType);
-
-        if (contentType!=null) {
-            logger.info('Valid URL for a .zip file');
-            console.log("hello");
-            return true;
-        } else {
-            logger.info('Invalid URL: Not a .zip file');
-            return false;
-        }
-    } catch (error) {
-        logger.error('Error validating URL:', error.message);
-        return false;
     }
 }
 
