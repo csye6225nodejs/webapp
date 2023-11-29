@@ -267,38 +267,31 @@ async function addSubmission(req, res){
         const userId = req.userId;
         const { submission_url } = req.body;
 
-        const result = await assignment.findOne({
-              where: {
-                uuid: assignment_id, 
-              },
-        });
-        
+        console.log("Assignment_id" +assignment_id);
+        const result = await assignment.findOne({ where: { uuid: assignment_id } });
        //getting email from assignment to account
-       const noOfSubmissions = getSubmissionCountByAssignmentId(result.dataValues.assignment_id);
+       const noOfSubmissions = await getSubmissionCountByAssignmentId(result.uuid);
        const user_id = result.dataValues.userId;
        const account_row = await account.findOne({ where: { id: user_id } });
        const email_id = account_row.dataValues.email;
-       
 
 
-       const submission_date = new Date(); 
-        
        if (!submission_url ) {
             logger.info("Submission URL values are missing, bad request");
             return res.status(400).send("Add Submission URL"); 
         };
 
-        /*if (/^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/.test(submission_url)) {
-            return res.status(400).json({ message: 'Invalid URL format' });
-        } */  
-        const response= await axios.head(submission_url);
-        if(response === null){
-            return res.status(400).send("URL does not return a response");
+        const regex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
+
+        if (!regex.test(submission_url)) {
+            return res.status(400).send("Invalid URL format");
+        } 
+        console.log("number"+result.num_of_attempts);
+
+        if(noOfSubmissions >= result.num_of_attempts){
+            return res.status(403).send("Number of attempts crossed");
         }
-       
-        const contentType = response.headers['content-type'];
-        if (contentType.includes('zip')) {
-        // If it's a ZIP file, create a new submission and save it to the database
+
         const newSubmission = await submission.create({
             assignment_id,
             submission_url
@@ -318,9 +311,6 @@ async function addSubmission(req, res){
 
         const sns = new AWS.SNS();
 
-        const str = JSON.stringify(message);
-        const retreive1 = JSON.parse(str);
-        console.log(retreive1.submissionDetails.submission_url);
         sns.publish({
             Message: JSON.stringify(message),
             TopicArn: process.env.SNS,
@@ -328,24 +318,14 @@ async function addSubmission(req, res){
         if (err) {
             console.error('Error publishing message to SNS:', err);
             logger.error('Error publishing message to SNS', err);
-            // Uncomment and customize the following line if used in an HTTP request handler
-            // res.status(500).send('Internal Server Error');
         } else {
             console.log('Message published to SNS:', data);
             logger.info('Message published to SNS', data);
-            // Uncomment and customize the following line if used in an HTTP request handler
-            // res.status(200).send('Message sent successfully');
         }
         });
 
         logger.info("Submission added to your assignment");
-        //console.log('New Submission:', newSubmission);
         return res.status(201).send(newSubmission);
-
-    }   else {
-            return res.status(404).json({ message: 'URL does not point to a ZIP file' });
-        }
-        //console.log(req.userId+"USer");
     }
     catch(error){
         logger.error("Error in adding submission");
@@ -365,10 +345,10 @@ async function getSubmissionCountByAssignmentId(assignmentId) {
       }
       const submissionCount = await submission.count({
         where: {
-          assignment_id: assignmentId,
-        },
+          assignment_id: assignmentId
+        }
       });
-  
+
       logger.info(`Number of submissions for assignment ${assignmentId}: ${submissionCount}`);
       return submissionCount;
     } catch (error) {
@@ -378,6 +358,7 @@ async function getSubmissionCountByAssignmentId(assignmentId) {
             return 0;
           } else {
             // Rethrow the error for other unexpected errors
+            
             logger.error('Error retrieving submission count:', error);
             throw error;
           }
