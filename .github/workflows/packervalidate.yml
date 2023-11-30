@@ -3,7 +3,7 @@ name: Check Packer Format and Validate
 on:
   pull_request:
     branches:
-      - main
+      - testing
 
 jobs:
   build:
