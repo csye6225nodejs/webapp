@@ -265,6 +265,19 @@ async function addSubmission(req, res){
 
         const assignment_id = req.params.id;
         const userId = req.userId;
+
+        const getUserEmail = (req, res) => {
+            const authheader = req.headers.authorization;
+            if (!authheader) {
+                return '';
+            }
+            const auth = new Buffer.from(authheader.split(' ')[1],
+                'base64').toString().split(':');
+            const email = auth[0];
+            const pass = auth[1];
+            return email;
+        }
+
         const { submission_url } = req.body;
 
         const queryParams = req.query;
@@ -281,7 +294,7 @@ async function addSubmission(req, res){
        const user_id = result.dataValues.userId;
        const account_row = await account.findOne({ where: { id: user_id } });
        const email_id = account_row.dataValues.email;
-
+       
 
        if (!submission_url ) {
             logger.info("Submission URL values are missing, bad request");
@@ -306,7 +319,7 @@ async function addSubmission(req, res){
 
         const message = {
             submissionDetails: newSubmission,
-            emailId: email_id,
+            emailId: getUserEmail,
             noOfSubmissions: noOfSubmissions
            };
         await sequelize.sync();
