@@ -258,6 +258,19 @@ async function deleteAssignment(req, res) {
     }
 }
 
+const getUserEmail = (req, res) => {
+    const authheader = req.headers.authorization;
+    if (!authheader) {
+        return '';
+    }
+    const auth = new Buffer.from(authheader.split(' ')[1],
+        'base64').toString().split(':');
+    const email = auth[0];
+    const pass = auth[1];
+    return email;
+}
+
+
 async function addSubmission(req, res){
 
     statsdClient.increment('v1/assignments/:id/submission_post_called');
@@ -266,17 +279,7 @@ async function addSubmission(req, res){
         const assignment_id = req.params.id;
         const userId = req.userId;
 
-        const getUserEmail = (req, res) => {
-            const authheader = req.headers.authorization;
-            if (!authheader) {
-                return '';
-            }
-            const auth = new Buffer.from(authheader.split(' ')[1],
-                'base64').toString().split(':');
-            const email = auth[0];
-            const pass = auth[1];
-            return email;
-        }
+        const email_id_val = getUserEmail(req,res);
 
         const { submission_url } = req.body;
 
@@ -319,7 +322,7 @@ async function addSubmission(req, res){
 
         const message = {
             submissionDetails: newSubmission,
-            emailId: getUserEmail,
+            emailId: email_id_val,
             noOfSubmissions: noOfSubmissions
            };
         await sequelize.sync();
