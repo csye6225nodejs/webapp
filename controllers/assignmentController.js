@@ -267,6 +267,13 @@ async function addSubmission(req, res){
         const userId = req.userId;
         const { submission_url } = req.body;
 
+        const queryParams = req.query;
+        
+        if (Object.keys(queryParams).length > 0) {
+            //logger.info("/healthz Get request has query parameters, its an error ");
+            res.status(400).send();
+        }
+
         console.log("Assignment_id" +assignment_id);
         const result = await assignment.findOne({ where: { uuid: assignment_id } });
        //getting email from assignment to account

@@ -9,10 +9,8 @@ const logger = require('./../logger/logger');
 router.get('/', authMiddleware.basicAuth , assignmentController.getAllAssignments);
 router.get('/:id', authMiddleware.basicAuth, assignmentController.getAssignment);
 router.post('/:id/submission', authMiddleware.basicAuth, assignmentController.addSubmission);
-router.get("*",(req,res) => {
-    logger.info("unknown get request path does not exist");
-    res.status(404).send();
-});
+
+
 
 
 router.post('/',authMiddleware.basicAuth, assignmentController.addAssignment);
@@ -27,6 +25,26 @@ router.delete('/',(req,res) => {
     res.status(400).send();
 });
 router.delete('/:id', authMiddleware.basicAuth, assignmentController.deleteAssignment);
+router.get('/:id/submission',(req,res) => {
+    logger.info("/:id path get request method is not allowed");
+    res.status(405).send();
+});
+
+router.put('/:id/submission',(req,res) => {
+    logger.info("/:id path put request method is not allowed");
+    res.status(405).send();
+});
+
+router.patch('/:id/submission',(req,res) => {
+    logger.info("/:id path put request method is not allowed");
+    res.status(405).send();
+});
+
+router.delete('/:id/submission',(req,res) => {
+    logger.info("/:id path put request method is not allowed");
+    res.status(405).send();
+});
+
 router.patch('/:id',(req,res) => {
     logger.info("/:id path patch request method is not allowed");
     res.status(405).send();});
@@ -34,7 +52,6 @@ router.patch('/:id',(req,res) => {
 router.get("*",(req,res) => {
         logger.info("unknown path get request does not exist");
         res.status(404).send();});
-
 router.patch('*', (req,res) => {
     logger.info("Unknown path patch request does not exist");
     res.status(404).send()});
