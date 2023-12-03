@@ -279,7 +279,7 @@ async function addSubmission(req, res){
         const assignment_id = req.params.id;
         const userId = req.userId;
 
-        const email_id_val = getUserEmail(req,res);
+        const email_id_val = await getUserEmail(req,res);
 
         const { submission_url } = req.body;
 

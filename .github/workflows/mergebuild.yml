@@ -77,3 +77,32 @@ jobs:
                     -var 'artifact=${{ github.workspace }}/webapp.zip' \
                     packer.pkr.hcl
         working-directory: ${{ github.workspace }}
+
+      - name: Extract AMI ID from Packer output
+        id: extract-ami-id
+        run: |
+          AMI_ID=$(grep -E -o 'ami-[a-zA-Z0-9]+' output.txt | tail -n1)
+          echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
+
+      - name: Create launch template
+        run: |
+          aws ec2 create-launch-template \
+            --launch-template-name MyLaunchTemplate \
+            --version-description "AMI Build" \
+            --version-number 1 \
+            --cli-input-json "$(jq -n \
+                --arg instanceType "t2.micro" \
+                --arg imageId "$AMI_ID" \
+                '{LaunchTemplateName: "MyLaunchTemplate", VersionDescription: "AMI Build", VersionNumber: 1, LaunchTemplateData: {InstanceType: $instanceType, ImageId: $imageId}}')"
+
+      - name: Update Auto Scaling Group
+        run: |
+          aws autoscaling update-auto-scaling-group \
+            --auto-scaling-group-name YourAutoScalingGroupName \
+            --launch-template LaunchTemplateName=MyLaunchTemplate,Version=2
+
+      - name: Start instance refresh
+        run: |
+          aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name YourAutoScalingGroupName \
+            --preferences '{"MinHealthyPercentage": 90, "InstanceWarmup": 300}'
