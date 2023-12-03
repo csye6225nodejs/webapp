@@ -78,36 +78,75 @@ jobs:
                     packer.pkr.hcl | tee ${{ github.workspace }}/output.txt
         working-directory: ${{ github.workspace }}
 
+      - name: Install AWS CLI
+        run: npm install -g aws-cli
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-2
+
       - name: Extract AMI ID from Packer output
         id: extract-ami-id
         run: |
           AMI_ID=$(grep -E -o 'ami-[a-zA-Z0-9]+' output.txt | tail -n1)
           echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-2
+          
 
-      - name: Create launch template
+      - name: Get Existing Launch Template ID
+        id: get-launch-template-id
         run: |
-          aws ec2 create-launch-template \
-            --launch-template-name MyLaunchTemplate \
-            --version-description "AMI Build" \
-            --version-number 1 \
-            --cli-input-json "$(jq -n \
-                --arg instanceType "t2.micro" \
-                --arg imageId "$AMI_ID" \
-                '{LaunchTemplateName: "MyLaunchTemplate", VersionDescription: "AMI Build", VersionNumber: 1, LaunchTemplateData: {InstanceType: $instanceType, ImageId: $imageId}}')"
+          TEMPLATE_NAME="MyLaunchTemplate"
+          TEMPLATE_ID=$(aws ec2 describe-launch-templates --launch-template-names $TEMPLATE_NAME --query 'LaunchTemplates[0].LaunchTemplateId' --output text)
+          echo "::set-output name=template-id::$TEMPLATE_ID"
         env:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: us-east-2
 
-      - name: Update Auto Scaling Group
+      - name: Get Current Template Version
+        id: get-current-template-version
         run: |
-          aws autoscaling update-auto-scaling-group \
-            --auto-scaling-group-name YourAutoScalingGroupName \
-            --launch-template LaunchTemplateName=MyLaunchTemplate,Version=2
+          TEMPLATE_ID="${{ steps.get-launch-template-id.outputs.template-id }}"
+          CURRENT_VERSION=$(aws ec2 describe-launch-template-versions --launch-template-id $TEMPLATE_ID --query 'LaunchTemplateVersions[0].VersionNumber' --output text)
+          echo "::set-output name=current-version::$CURRENT_VERSION"
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: us-east-2
+
+      - name: Update Launch Template
+        run: |
+            TEMPLATE_ID="${{ steps.get-launch-template-id.outputs.template-id }}"
+            CURRENT_VERSION="${{ steps.get-current-template-version.outputs.current-version }}"
+            aws ec2 create-launch-template-version --launch-template-id $TEMPLATE_ID --version-description "Update AMI" --cli-input-json "$(jq -n --arg imageId "$AMI_ID" --arg currentVersion "$CURRENT_VERSION" '{LaunchTemplateData: {ImageId: $imageId}, VersionDescription: "Update AMI", SourceVersion: $currentVersion}')"
         env:
               AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
               AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
               AWS_DEFAULT_REGION: us-east-2
+
+      - name: Get Auto Scaling Group Name
+        id: get-asg-name
+        run: |
+            ASG_NAME="web-autoscaling-group"
+            echo "::set-output name=asg-name::$ASG_NAME"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-2
+
+      - name: Update Auto Scaling Group
+        run: |
+          aws autoscaling update-auto-scaling-group \
+          --auto-scaling-group-name YourAutoScalingGroupName \
+          --launch-template LaunchTemplateName=MyLaunchTemplate,Version=2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-2
 
       - name: Start instance refresh
         run: |
