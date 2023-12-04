@@ -126,9 +126,7 @@ jobs:
             LATEST_VERSION=$(aws ec2 describe-launch-template-versions --launch-template-id "$TEMPLATE_ID" --query 'LaunchTemplateVersions | sort_by(@, &VersionNumber) | [-1].VersionNumber' --output text)
 
             # Update the Auto Scaling Group to use the latest Launch Template version
-            aws autoscaling update-auto-scaling-group \
-            --auto-scaling-group-name $DEFAULT_ASG_NAME \
-            --launch-template "LaunchTemplateId=$TEMPLATE_ID,Version=$LATEST_VERSION"
+            aws autoscaling update-auto-scaling-group --auto-scaling-group-name $DEFAULT_ASG_NAME --launch-template "LaunchTemplateId=$TEMPLATE_ID,Version=$LATEST_VERSION"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
