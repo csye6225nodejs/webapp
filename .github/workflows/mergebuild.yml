@@ -118,11 +118,8 @@ jobs:
                 LATEST_VERSION=$(aws ec2 describe-launch-template-versions --launch-template-id "$TEMPLATE_ID" --versions '$Latest' --query 'LaunchTemplateVersions | sort_by(@, &VersionNumber) | [-1].VersionNumber' --output text)
                 echo "LATEST VERSION: $LATEST_VERSION"
                                 
-                # Update the Auto Scaling Group to use the latest Launch Template version
-                                                    
-                aws autoscaling update-auto-scaling-group \                               
-                --auto-scaling-group-name $DEFAULT_ASG_NAME \                     
-                --launch-template "LaunchTemplateId=$TEMPLATE_ID,Version=$LATEST_VERSION"
+              # Update the Auto Scaling Group to use the latest Launch Template version                                      
+              aws autoscaling update-auto-scaling-group --auto-scaling-group-name $DEFAULT_ASG_NAME --launch-template "LaunchTemplateId=$TEMPLATE_ID,Version=$LATEST_VERSION"
                                                 
 
               aws autoscaling start-instance-refresh \
