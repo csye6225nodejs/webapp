@@ -120,7 +120,6 @@ jobs:
         id: get-latest-launch-template-version
         run: |
 
-            TEMPLATE_ID=$TEMPLATE_ID
             # Get information about all versions of the Launch Template
             LAUNCH_TEMPLATE_VERSIONS=$(aws ec2 describe-launch-template-versions --launch-template-id $TEMPLATE_ID --query 'LaunchTemplateVersions[*].VersionNumber' --output json)
             # Extract the latest version number
