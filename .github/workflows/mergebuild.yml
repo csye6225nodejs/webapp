@@ -112,16 +112,17 @@ jobs:
                                                       --query 'sort_by(Images, &CreationDate)[-1].ImageId' \
                                                     --output text)"
 
-                TEMPLATE_ID="${{ steps.get-launch-template-id.outputs.template-id }}"
+                TEMPLATE_ID=$(aws ec2 describe-launch-templates --query 'LaunchTemplates[0].LaunchTemplateId' --output text)
+
+                echo "Template ID is $TEMPLATE_ID"
                 DEFAULT_ASG_NAME=$(aws autoscaling describe-auto-scaling-groups --query 'AutoScalingGroups[0].AutoScalingGroupName' --output text)
-                echo "Default ASG Name is $DEFAULT_AS G_NAME"
+                echo "Default ASG Name is $DEFAULT_ASG_NAME"
                 LATEST_VERSION=$(aws ec2 describe-launch-template-versions --launch-template-id "$TEMPLATE_ID" --versions '$Latest' --query 'LaunchTemplateVersions | sort_by(@, &VersionNumber) | [-1].VersionNumber' --output text)
                 echo "LATEST VERSION: $LATEST_VERSION"
                                 
               # Update the Auto Scaling Group to use the latest Launch Template version                                      
               aws autoscaling update-auto-scaling-group --auto-scaling-group-name $DEFAULT_ASG_NAME --launch-template "LaunchTemplateId=$TEMPLATE_ID,Version=$LATEST_VERSION"
                                                 
-
               aws autoscaling start-instance-refresh \
                 --auto-scaling-group-name $(aws autoscaling describe-auto-scaling-groups \
                                               --query "AutoScalingGroups[0].AutoScalingGroupName" \
