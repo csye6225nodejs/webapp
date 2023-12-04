@@ -106,13 +106,14 @@ jobs:
       - name: Get Existing Launch Template ID
         id: get-launch-template-id
         run: |
-          TEMPLATE_NAME="MyLaunchTemplate"
-          TEMPLATE_ID=$(aws ec2 describe-launch-templates --launch-template-names $TEMPLATE_NAME --query 'LaunchTemplates[0].LaunchTemplateId' --output text)
+          # List all Launch Templates and extract the first one (you may adjust the logic as needed)
+          TEMPLATE_ID=$(aws ec2 describe-launch-templates --query 'LaunchTemplates[0].LaunchTemplateId' --output text)
           echo "::set-output name=template-id::$TEMPLATE_ID"
         env:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: us-east-2
+        
 
       - name: Get Current Template Version
         id: get-current-template-version
