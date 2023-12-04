@@ -94,12 +94,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-2
-
-      - name: Debug AWS Credentials
-        run: |
-          echo "AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
-          echo "AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY"
-          aws configure list
         
       - name: Get Existing Launch Template ID
         id: get-launch-template-id
@@ -112,35 +106,40 @@ jobs:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             AWS_DEFAULT_REGION: us-east-2
         
-
-      - name: Get Current Template Version
-        id: get-current-template-version
-        run: |
-          TEMPLATE_ID="${{ steps.get-launch-template-id.outputs.template-id }}"
-          CURRENT_VERSION=$(aws ec2 describe-launch-template-versions --launch-template-id $TEMPLATE_ID --query 'LaunchTemplateVersions[0].VersionNumber' --output text)
-          echo "::set-output name=current-version::$CURRENT_VERSION"
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            AWS_DEFAULT_REGION: us-east-2
-
       - name: Update Launch Template
         run: |
             TEMPLATE_ID="${{ steps.get-launch-template-id.outputs.template-id }}"
             CURRENT_VERSION="${{ steps.get-current-template-version.outputs.current-version }}"
             aws ec2 create-launch-template-version --launch-template-id $TEMPLATE_ID --version-description "Update AMI" --cli-input-json "$(jq -n --arg imageId "$AMI_ID" --arg currentVersion "$CURRENT_VERSION" '{LaunchTemplateData: {ImageId: $imageId}, VersionDescription: "Update AMI", SourceVersion: $currentVersion}')"
         env:
-              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-              AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-              AWS_DEFAULT_REGION: us-east-2
-             
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: us-east-2
+
+      - name: Get Latest Launch Template Version
+        id: get-latest-launch-template-version
+        run: |
+
+            TEMPLATE_ID=$TEMPLATE_ID
+            # Get information about all versions of the Launch Template
+            LAUNCH_TEMPLATE_VERSIONS=$(aws ec2 describe-launch-template-versions --launch-template-id $TEMPLATE_ID --query 'LaunchTemplateVersions[*].VersionNumber' --output json)
+            # Extract the latest version number
+            LATEST_VERSION=$(echo $LAUNCH_TEMPLATE_VERSIONS | jq -r 'max')
+              
+            echo "::set-output name=latest-launch-template-version::$LATEST_VERSION"
+
+            echo "LATEST VERSION IS $LATEST_VERSION"
+
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-2
+          
       - name: Update Auto Scaling Group with Latest Launch Template Version
         run: |
             ASG_NAME="web-autoscaling-group"
             TEMPLATE_ID="${{ steps.get-launch-template-id.outputs.template-id }}"
                 
-            # Get the latest version of the Launch Template
-            LATEST_VERSION=$(aws ec2 describe-launch-template-versions --launch-template-id $TEMPLATE_ID --query 'LaunchTemplateVersions[-1].VersionNumber' --output text)
             echo "Latest version = $LATEST_VERSION" 
             # Update the Auto Scaling Group to use the latest Launch Template version
             aws autoscaling update-auto-scaling-group \
