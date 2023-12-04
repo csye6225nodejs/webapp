@@ -77,4 +77,4 @@ ALTER USER ‘root’@’localhost’ IDENTIFIED BY ‘Abhi\$3534’
 
 MYSQL_SCRIPT
 
-Testing 1
+Testing 2
