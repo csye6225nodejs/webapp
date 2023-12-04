@@ -101,8 +101,6 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY"
           aws configure list
         
-          
-
       - name: Get Existing Launch Template ID
         id: get-launch-template-id
         run: |
@@ -135,12 +133,19 @@ jobs:
               AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
               AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
               AWS_DEFAULT_REGION: us-east-2
-
-      - name: Get Auto Scaling Group Name
-        id: get-asg-name
+             
+      - name: Update Auto Scaling Group with Latest Launch Template Version
         run: |
             ASG_NAME="web-autoscaling-group"
-            echo "::set-output name=asg-name::$ASG_NAME"
+            TEMPLATE_ID="${{ steps.get-launch-template-id.outputs.template-id }}"
+                
+            # Get the latest version of the Launch Template
+            LATEST_VERSION=$(aws ec2 describe-launch-template-versions --launch-template-id $TEMPLATE_ID --query 'LaunchTemplateVersions[-1].VersionNumber' --output text)
+            echo "Latest version = $LATEST_VERSION" 
+            # Update the Auto Scaling Group to use the latest Launch Template version
+            aws autoscaling update-auto-scaling-group \
+            --auto-scaling-group-name $ASG_NAME \
+            --launch-template "LaunchTemplateId=$TEMPLATE_ID,Version=$LATEST_VERSION"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -151,7 +156,8 @@ jobs:
           aws autoscaling start-instance-refresh \
           --auto-scaling-group-name $(aws autoscaling describe-auto-scaling-groups \
           --query "AutoScalingGroups[0].AutoScalingGroupName" \
-          --output text)
+          --output text)\
+              ]
 
           while [[ "$(aws autoscaling describe-instance-refreshes --auto-scaling-group-name $(aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[0].AutoScalingGroupName" --output text) --query 'InstanceRefreshes[0].Status' --output text)" != "Successful" ]]; do
             echo "Waiting for instance refresh to complete..."
