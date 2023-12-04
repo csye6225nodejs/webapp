@@ -84,18 +84,8 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-2
-
-      - name: Extract AMI ID from Packer output
-        id: extract-ami-id
-        run: |
-          AMI_ID=$(grep -E -o 'ami-[a-zA-Z0-9]+' output.txt | tail -n1)
-          echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: us-east-2
         
-      - name: New Launch Template Version & ASG Refresh
+      - name: New Launch Template Version & ASG Refresh DEV
         run: |
             if ! [[ $launch_template_id == null ]] && ! [[ $auto_scaling_name == null ]]
             then
@@ -140,4 +130,51 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-2
+
+      - name: New Launch Template Version & ASG Refresh DEMO
+        run: |
+              if ! [[ $launch_template_id == null ]] && ! [[ $auto_scaling_name == null ]]
+              then
+                echo "Launch Template Found"
+      
+                aws ec2 create-launch-template-version \
+                  --launch-template-id $(aws ec2 describe-launch-templates \
+                                          --query 'sort_by(LaunchTemplates, &CreateTime)[-1].LaunchTemplateId' \
+                                          --output text) \
+                  --version-description Version2 \
+                  --source-version 1 \
+                  --launch-template-data "ImageId=$(aws ec2 describe-images \
+                                                      --owners ${{ secrets.AMI_OWNER_ID}} \
+                                                        --query 'sort_by(Images, &CreationDate)[-1].ImageId' \
+                                                      --output text)"
+  
+                  TEMPLATE_ID=$(aws ec2 describe-launch-templates --query 'LaunchTemplates[0].LaunchTemplateId' --output text)
+  
+                  echo "Template ID is $TEMPLATE_ID"
+                  DEFAULT_ASG_NAME=$(aws autoscaling describe-auto-scaling-groups --query 'AutoScalingGroups[0].AutoScalingGroupName' --output text)
+                  echo "Default ASG Name is $DEFAULT_ASG_NAME"
+                  LATEST_VERSION=$(aws ec2 describe-launch-template-versions --launch-template-id "$TEMPLATE_ID" --versions '$Latest' --query 'LaunchTemplateVersions | sort_by(@, &VersionNumber) | [-1].VersionNumber' --output text)
+                  echo "LATEST VERSION: $LATEST_VERSION"
+                                  
+                # Update the Auto Scaling Group to use the latest Launch Template version                                      
+                aws autoscaling update-auto-scaling-group --auto-scaling-group-name $DEFAULT_ASG_NAME --launch-template "LaunchTemplateId=$TEMPLATE_ID,Version=$LATEST_VERSION"
+                                                  
+                aws autoscaling start-instance-refresh \
+                  --auto-scaling-group-name $(aws autoscaling describe-auto-scaling-groups \
+                                                --query "AutoScalingGroups[0].AutoScalingGroupName" \
+                                                --output text)
+                  
+              else
+                echo "Launch Template Not Found"
+              fi
+      
+              while [[ "$(aws autoscaling describe-instance-refreshes --auto-scaling-group-name $(aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[0].AutoScalingGroupName" --output text) --query 'InstanceRefreshes[0].Status' --output text)" != "Successful" ]]; do
+                echo "Waiting for instance refresh to complete..."
+                sleep 30
+              done
+  
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AMI_DEMO_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AMI_DEMO_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-2
