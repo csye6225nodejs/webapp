@@ -123,7 +123,7 @@ jobs:
 
             DEFAULT_ASG_NAME=$(aws autoscaling describe-auto-scaling-groups --query 'AutoScalingGroups[0].AutoScalingGroupName' --output text)
             echo "Default ASG Name is $DEFAULT_ASG_NAME"
-
+            LATEST_VERSION=$(aws ec2 describe-launch-template-versions --launch-template-id "$TEMPLATE_ID" --query 'LaunchTemplateVersions | sort_by(@, &VersionNumber) | [-1].VersionNumber' --output text)
 
             # Update the Auto Scaling Group to use the latest Launch Template version
             aws autoscaling update-auto-scaling-group \
