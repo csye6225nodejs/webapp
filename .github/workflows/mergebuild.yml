@@ -110,7 +110,13 @@ jobs:
         run: |
             TEMPLATE_ID="${{ steps.get-launch-template-id.outputs.template-id }}"
             CURRENT_VERSION="${{ steps.get-current-template-version.outputs.current-version }}"
-            aws ec2 create-launch-template-version --launch-template-id "$TEMPLATE_ID" --version-description "Update AMI" --cli-input-json "$(jq -n --arg imageId "$AMI_ID" --arg currentVersion "$CURRENT_VERSION" '{LaunchTemplateData: {ImageId: $imageId}, VersionDescription: "Update AMI", SourceVersion: $currentVersion}')"
+            aws ec2 create-launch-template-version \
+            --launch-template-id $(aws ec2 describe-launch-templates \
+                                    --query 'sort_by(LaunchTemplates, &CreateTime)[-1].LaunchTemplateId' \
+                                    --output text) \
+            --version-description Update-Launch-Template \
+            --source-version 1 \
+            --launch-template-data "ImageId=$AMI_ID"
         env:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
