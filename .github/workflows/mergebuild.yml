@@ -135,7 +135,7 @@ jobs:
       - name: New Launch Template Version & ASG Refresh DEMO
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AMI_DEMO_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AMI_DEMO_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AMI_DEMO_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: us-east-2
         run: |
               if ! [[ $launch_template_id == null ]] && ! [[ $auto_scaling_name == null ]]
