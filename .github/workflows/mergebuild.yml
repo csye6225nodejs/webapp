@@ -110,7 +110,7 @@ jobs:
         run: |
             TEMPLATE_ID="${{ steps.get-launch-template-id.outputs.template-id }}"
             CURRENT_VERSION="${{ steps.get-current-template-version.outputs.current-version }}"
-            aws ec2 create-launch-template-version --launch-template-id $TEMPLATE_ID --version-description "Update AMI" --cli-input-json "$(jq -n --arg imageId "$AMI_ID" --arg currentVersion "$CURRENT_VERSION" '{LaunchTemplateData: {ImageId: $imageId}, VersionDescription: "Update AMI", SourceVersion: $currentVersion}')"
+            aws ec2 create-launch-template-version --launch-template-id "$TEMPLATE_ID" --version-description "Update AMI" --cli-input-json "$(jq -n --arg imageId "$AMI_ID" --arg currentVersion "$CURRENT_VERSION" '{LaunchTemplateData: {ImageId: $imageId}, VersionDescription: "Update AMI", SourceVersion: $currentVersion}')"
         env:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -121,7 +121,7 @@ jobs:
         run: |
 
             # Get information about all versions of the Launch Template
-            LAUNCH_TEMPLATE_VERSIONS=$(aws ec2 describe-launch-template-versions --launch-template-id $TEMPLATE_ID --query 'LaunchTemplateVersions[*].VersionNumber' --output json)
+            LAUNCH_TEMPLATE_VERSIONS=$(aws ec2 describe-launch-template-versions --launch-template-id "$TEMPLATE_ID" --query 'LaunchTemplateVersions[*].VersionNumber' --output json)
             # Extract the latest version number
             LATEST_VERSION=$(echo $LAUNCH_TEMPLATE_VERSIONS | jq -r 'max')
               
