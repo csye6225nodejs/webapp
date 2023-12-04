@@ -76,3 +76,5 @@ CREATE DATABASE IF NOT EXISTS cloudschema;
 ALTER USER ‘root’@’localhost’ IDENTIFIED BY ‘Abhi\$3534’
 
 MYSQL_SCRIPT
+
+Testing 1
