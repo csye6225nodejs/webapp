@@ -157,7 +157,7 @@ jobs:
                   echo "LATEST VERSION: $LATEST_VERSION"
                                   
                 # Update the Auto Scaling Group to use the latest Launch Template version                                      
-                aws autoscaling update-auto-scaling-group --auto-scaling-group-name $DEFAULT_ASG_NAME --launch-template "LaunchTemplateId=$TEMPLATE_ID,Version=$LATEST_VERSION"
+                aws autoscaling update-auto-scaling-group --auto-scaling-group-name $DEFAULT_ASG_NAME --launch-template "LaunchTemplateId=$TEMPLATE_ID,Version=$LATEST_VERSION" --desired-capacity "1"
                                                   
                 aws autoscaling start-instance-refresh \
                   --auto-scaling-group-name $(aws autoscaling describe-auto-scaling-groups \
