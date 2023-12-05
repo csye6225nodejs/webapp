@@ -78,3 +78,6 @@ ALTER USER ‘root’@’localhost’ IDENTIFIED BY ‘Abhi\$3534’
 MYSQL_SCRIPT
 
 Testing 2
+
+# Command to process certificate
+aws acm import-certificate --certificate file://certificate.pem --private-key file://private-key.pem --certificate-chain file://certificate-chain.pem --region <your-region>

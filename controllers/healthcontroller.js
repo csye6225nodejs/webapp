@@ -33,7 +33,7 @@ async function healthcontroller(req, res) {
         LoadFromCSV();
         //logger.info("Succesfully connected to the database");
         //statsdClient.increment('requests.processed');
-        res.status(200).send("Updated code");
+        res.status(200).send("");
     }
 }
 
