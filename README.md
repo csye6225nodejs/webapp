@@ -80,4 +80,10 @@ MYSQL_SCRIPT
 Testing 2
 
 # Command to process certificate
-aws acm import-certificate --certificate file://certificate.pem --private-key file://private-key.pem --certificate-chain file://certificate-chain.pem --region <your-region>
+1. Buy the SSL Certificate from NameCheap
+2. Activate the SSL Certificate and Download the Certificate, Private and Chain Keys
+3. Save those files with the names: certificate.pem, private-key.pem and certificate-chain.pem
+4. Run the following command with respective aws profile, region to import the certificate:
+
+```bash
+aws acm import-certificate --certificate file://certificate.pem --private-key file://private-key.pem --certificate-chain file://certificate-chain.pem --region us-east-1
