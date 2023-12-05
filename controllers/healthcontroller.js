@@ -27,7 +27,6 @@ async function healthcontroller(req, res) {
     const result = await startDb();
     if (result === false) {
         //logger.info("error in connecting to the database");
-        //
         res.status(503).send();
     } else if (result === true) {
         LoadFromCSV();
